@@ -22,6 +22,9 @@ git clone https://github.com/Phoenix-Education-Project/team9repo
 
 ```sh
 python -m venv “venv”
+```
+
+```sh
 .\venv\Scripts\activate (для Linux: source ./venv/bin/activate)
 ```
 
