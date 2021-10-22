@@ -117,7 +117,7 @@ class VotingArea(models.Model):
     is_opened = models.BooleanField(
         verbose_name="Участок открыт", default=True)
     num_voting_area = models.IntegerField(
-        verbose_name="Номер участка", default=0)
+        verbose_name="Номер участка", default=0, unique=True)
     max_people = models.IntegerField(
         verbose_name="Макс кол-во людей", default=0)
     count_voters = models.IntegerField(
