@@ -1,5 +1,5 @@
-import { ExampleActionCreators } from './exampleReducer/action-creators';
+import { AuthActionCreators } from './authReducer/action-creators';
 
 export const allActionCreators = {
-  ...ExampleActionCreators,
+  ...AuthActionCreators,
 };

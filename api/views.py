@@ -1,10 +1,11 @@
-from jwt import exceptions
-from rest_framework.decorators import api_view, permission_classes
+# from jwt import exceptions
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.http import JsonResponse
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework import exceptions
+from api.authentication import JWTAuthentication
 from api.permissions import IsEmployee
 from api.utils import generate_access_token, generate_refresh_token
 
@@ -15,14 +16,18 @@ import jwt
 
 
 @api_view(['GET'])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def HelloWorldView(request):
     if request.method == 'GET':
         return JsonResponse("Hello world from django's API!", safe=False)
 
 
-@permission_classes([AllowAny])
+# @permission_classes([AllowAny])
 class RegisterView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny, ]
+
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -30,8 +35,11 @@ class RegisterView(APIView):
         return Response(serializer.data)
 
 
-@permission_classes([AllowAny])
+# @permission_classes([AllowAny])
 class LoginView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny, ]
+
     def post(self, request):
         login = request.data['login']
         password = request.data['password']
@@ -39,10 +47,10 @@ class LoginView(APIView):
         user = User.objects.filter(login=login).first()
 
         if user is None:
-            raise AuthenticationFailed('User not found!')
+            raise exceptions.AuthenticationFailed('User not found!')
 
         if not user.check_password(password):
-            raise AuthenticationFailed('Incorrect password!')
+            raise exceptions.AuthenticationFailed('Incorrect password!')
 
         access_token = generate_access_token(user)
         expiresIn, refresh_token = generate_refresh_token(user)
@@ -70,8 +78,11 @@ class LogoutView(APIView):
         return response
 
 
-@permission_classes([AllowAny])
+# @permission_classes([AllowAny])
 class RefreshTokensView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny, ]
+
     def get(self, request):
         refresh_token = request.COOKIES.get('refresh_token')
         if refresh_token is None:
@@ -109,8 +120,11 @@ class RefreshTokensView(APIView):
         return response
 
 
-@permission_classes([IsEmployee])
+# @permission_classes([IsEmployee])
 class UserView(APIView):
+    authentication_classes = [JWTAuthentication, ]
+    permission_classes = [IsEmployee, ]
+
     def get(self, request):
         user = request.user
         serializer = UserSerializer(user)

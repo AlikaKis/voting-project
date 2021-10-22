@@ -11,12 +11,14 @@ from rest_framework import exceptions
 
 
 class JWTAuthentication(authentication.BaseAuthentication):
+
     def authenticate(self, request):
-        authorization_heaader = request.headers.get('Authorization')
-        if not authorization_heaader:
-            return None
+        authorization_header = request.headers.get('Authorization')
+        if not authorization_header:
+            # return None
+            raise exceptions.AuthenticationFailed('No Authorization header')
         try:
-            access_token = authorization_heaader.split(' ')[1]
+            access_token = authorization_header.split(' ')[1]
             payload = jwt.decode(
                 access_token, SECRET_KEY, algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
