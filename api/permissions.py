@@ -9,7 +9,7 @@ class IsEmployee(BasePermission):
         access_token = authorization_heaader.split(' ')[1]
         payload = jwt.decode(
             access_token, SECRET_KEY, algorithms=['HS256'])
-        return request.user and request.user.userType == "employee" and request.user.userType == payload['userType']
+        return request.user and (request.user.userType == "employee" or request.user.userType == "admin") and request.user.userType == payload['userType']
 
 
 class IsAdmin(BasePermission):

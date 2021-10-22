@@ -1,4 +1,3 @@
-# from jwt import exceptions
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.http import JsonResponse
 from rest_framework.permissions import AllowAny
@@ -23,7 +22,6 @@ def HelloWorldView(request):
         return JsonResponse("Hello world from django's API!", safe=False)
 
 
-# @permission_classes([AllowAny])
 class RegisterView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny, ]
@@ -35,7 +33,6 @@ class RegisterView(APIView):
         return Response(serializer.data)
 
 
-# @permission_classes([AllowAny])
 class LoginView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny, ]
@@ -78,7 +75,6 @@ class LogoutView(APIView):
         return response
 
 
-# @permission_classes([AllowAny])
 class RefreshTokensView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny, ]
@@ -120,7 +116,6 @@ class RefreshTokensView(APIView):
         return response
 
 
-# @permission_classes([IsEmployee])
 class UserView(APIView):
     authentication_classes = [JWTAuthentication, ]
     permission_classes = [IsEmployee, ]
