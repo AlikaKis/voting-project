@@ -1,0 +1,29 @@
+.header{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 50px;
+    box-sizing: border-box;
+    height: 150px;
+    &__clock{
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px 40px;
+        width: 192px;
+        height: 54px;
+        font-size: 40px;
+        color: var(--text-color-light);
+        font-weight: 700;
+        background-color: var(--primary-color);
+
+    }
+    &__logo{
+        height: 100%;
+        display: block;
+    }
+    &__clock_hidden{
+        visibility: hidden;
+    }
+}

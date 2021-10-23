@@ -28,38 +28,46 @@ export const AuthActionCreators = {
     type: AuthActionsEnum.IS_TRYING_LOGIN_ACTION,
     payload: isTryingLogin,
   }),
-  setLoginError: (error: string): SetLoginErrorAction => ({
+  setLoginError: (error: string | null): SetLoginErrorAction => ({
     type: AuthActionsEnum.ERROR_LOGIN_ACTION,
     payload: error,
   }),
-  setRefreshingError: (error: string): SetRefreshingErrorAction => ({
+  setRefreshingError: (error: string | null): SetRefreshingErrorAction => ({
     type: AuthActionsEnum.ERROR_REFRESH_ACTION,
     payload: error,
   }),
   fetchRefreshTokens: () => async (dispatch: AppDispatch) => {
     try {
-      AuthActionCreators.setIsRefreshing(true);
+      dispatch(AuthActionCreators.setIsRefreshing(true));
+      dispatch(AuthActionCreators.setRefreshingError(null));
       const result = await VotingService.refreshTokens();
       dispatch(AuthActionCreators.saveNewToken(result.data.access_token));
-      AuthActionCreators.setIsRefreshing(false);
+      dispatch(AuthActionCreators.setIsRefreshing(false));
     } catch (error) {
       dispatch(AuthActionCreators.clearAuthState());
-      AuthActionCreators.setRefreshingError((error as AxiosError<string>).message);
+      dispatch(
+        AuthActionCreators.setRefreshingError((error as AxiosError<string>).message),
+      );
     }
   },
   fetchLogin: (login: string, password: string) => async (dispatch: AppDispatch) => {
     try {
-      AuthActionCreators.setIsTryingLogin(true);
+      dispatch(AuthActionCreators.setIsTryingLogin(true));
+      dispatch(AuthActionCreators.setLoginError(null));
       const result = await VotingService.login(login, password);
       dispatch(AuthActionCreators.saveNewToken(result.data.access_token));
+      dispatch(AuthActionCreators.setIsTryingLogin(false));
     } catch (error) {
-      AuthActionCreators.setIsTryingLogin(false);
-      AuthActionCreators.setLoginError((error as AxiosError<string>).message);
+      dispatch(AuthActionCreators.setIsTryingLogin(false));
+      dispatch(AuthActionCreators.setLoginError((error as AxiosError<string>).message));
+      setTimeout(() => {
+        dispatch(AuthActionCreators.setLoginError(null));
+      }, 2000);
     }
   },
   fetchLogout: () => async (dispatch: AppDispatch) => {
     try {
-      AuthActionCreators.setIsTryingLogin(true);
+      dispatch(AuthActionCreators.setIsTryingLogin(true));
       await VotingService.logout();
       dispatch(AuthActionCreators.clearAuthState());
     } catch (error) {

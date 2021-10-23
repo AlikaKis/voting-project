@@ -37,12 +37,12 @@ export interface SetIsTryingToLoginAction {
 
 export interface SetRefreshingErrorAction {
   type: AuthActionsEnum.ERROR_REFRESH_ACTION;
-  payload: string;
+  payload: string | null;
 }
 
 export interface SetLoginErrorAction {
   type: AuthActionsEnum.ERROR_LOGIN_ACTION;
-  payload: string;
+  payload: string | null;
 }
 
 export type AuthAction =

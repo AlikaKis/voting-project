@@ -1,6 +1,7 @@
+import './App.css';
+
 import { FC, useEffect } from 'react';
 
-import styles from './App.module.css';
 import AppRouter from './components/AppRouter';
 import { useActions } from './hooks/useActions';
 import { useTypedSelector } from './hooks/useTypedSelector';
@@ -28,7 +29,7 @@ const App: FC = () => {
     }
   }, [access_token, history.location.pathname]);
   return (
-    <div className={styles['App']}>
+    <div className="wrapper">
       {!isFirstRefreshDone ? <span>Загрузка</span> : <AppRouter />}
     </div>
   );

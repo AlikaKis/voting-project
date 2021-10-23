@@ -27,7 +27,11 @@ api.interceptors.response.use(undefined, async (error: AxiosError) => {
   }
 
   if (error.response.status === 403) {
-    if (error.response.config.url === API_URLS.REFRESH_TOKENS) {
+    if (error.response.config.url === API_URLS.LOGIN) {
+      return new Promise((_, reject) => {
+        reject(error);
+      });
+    } else if (error.response.config.url === API_URLS.REFRESH_TOKENS) {
       dispatch(AuthActionCreators.clearAuthState());
       return new Promise((_, reject) => {
         reject(error);
