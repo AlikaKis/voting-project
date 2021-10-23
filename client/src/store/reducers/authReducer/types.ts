@@ -1,12 +1,19 @@
 export interface AuthState {
   access_token: string | null;
   isRefreshing: boolean;
-  error: string | null;
+  isTryingToLogin: boolean;
+  errorRefreshing: string | null;
+  errorLogin: string | null;
+  isFirstRefreshDone: boolean;
 }
 
 export enum AuthActionsEnum {
   CLEAR_AUTH_ACTION = 'CLEAR_AUTH_ACTION',
   SAVE_NEW_TOKEN_ACTION = 'SAVE_NEW_TOKEN_ACTION',
+  IS_REFRESHING_ACTION = 'IS_REFRESHING_ACTION',
+  IS_TRYING_LOGIN_ACTION = 'IS_TRYING_LOGIN_ACTION',
+  ERROR_LOGIN_ACTION = 'ERROR_LOGIN_ACTION',
+  ERROR_REFRESH_ACTION = 'ERROR_REFRESH_ACTION',
 }
 
 export interface ClearAuthAction {
@@ -18,4 +25,30 @@ export interface SaveNewTokenAction {
   payload: string;
 }
 
-export type AuthAction = ClearAuthAction | SaveNewTokenAction;
+export interface SetIsTokenRefreshingAction {
+  type: AuthActionsEnum.IS_REFRESHING_ACTION;
+  payload: boolean;
+}
+
+export interface SetIsTryingToLoginAction {
+  type: AuthActionsEnum.IS_TRYING_LOGIN_ACTION;
+  payload: boolean;
+}
+
+export interface SetRefreshingErrorAction {
+  type: AuthActionsEnum.ERROR_REFRESH_ACTION;
+  payload: string;
+}
+
+export interface SetLoginErrorAction {
+  type: AuthActionsEnum.ERROR_LOGIN_ACTION;
+  payload: string;
+}
+
+export type AuthAction =
+  | ClearAuthAction
+  | SaveNewTokenAction
+  | SetIsTokenRefreshingAction
+  | SetIsTryingToLoginAction
+  | SetRefreshingErrorAction
+  | SetLoginErrorAction;

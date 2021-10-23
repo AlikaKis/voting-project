@@ -8,7 +8,7 @@ from api.authentication import JWTAuthentication
 from api.permissions import IsEmployee
 from api.utils import generate_access_token, generate_refresh_token
 
-from app.settings import DOMAIN, REFRESH_TOKEN_TIME_IN_DAYS, SECRET_KEY
+from app.settings import DOMAIN, REFRESH_TOKEN_TIME_IN_DAYS, SECRET_KEY, DEBUG
 from .serializers import UserSerializer
 from .models import RefreshTokens, User
 import jwt
@@ -57,8 +57,8 @@ class LoginView(APIView):
 
         response = Response()
 
-        response.set_cookie(key='refresh_token', value=refresh_token,
-                            httponly=True, domain=DOMAIN, path='/api/auth', max_age=REFRESH_TOKEN_TIME_IN_DAYS * 24 * 60 * 60)
+        response.set_cookie(key='refresh_token', value=refresh_token, samesite="Lax",
+                            httponly=True, max_age=REFRESH_TOKEN_TIME_IN_DAYS * 24 * 60 * 60)
         response.data = {
             'access_token': access_token
         }
@@ -66,7 +66,15 @@ class LoginView(APIView):
 
 
 class LogoutView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny, ]
+
     def get(self, request):
+        refresh_token = request.COOKIES.get('refresh_token')
+        saved_token = RefreshTokens.objects.filter(
+            refreshToken=refresh_token).first()
+        if saved_token is not None:
+            saved_token.delete()
         response = Response()
         response.delete_cookie('refresh_token')
         response.data = {
@@ -108,8 +116,8 @@ class RefreshTokensView(APIView):
 
         response = Response()
         response.delete_cookie('refresh_token')
-        response.set_cookie(key='refresh_token', value=refresh_token,
-                            httponly=True, domain=DOMAIN, path='/api/auth', max_age=REFRESH_TOKEN_TIME_IN_DAYS * 24 * 60 * 60)
+        response.set_cookie(key='refresh_token', value=refresh_token, samesite="Lax",
+                            httponly=True, max_age=REFRESH_TOKEN_TIME_IN_DAYS * 24 * 60 * 60)
         response.data = {
             'access_token': access_token
         }
