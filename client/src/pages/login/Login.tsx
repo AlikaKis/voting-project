@@ -1,8 +1,10 @@
 import classNames from 'classnames';
 import { Formik } from 'formik';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import * as yup from 'yup';
 
+import FormButton from '../../components/FormButton/FormButton';
+import FormInput from '../../components/FormInput/FormInput';
 import Header from '../../components/Header/Header';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import { useActions } from '../../hooks/useActions';
@@ -14,7 +16,6 @@ import styles from './styles.module.scss';
 const Login: FC = () => {
   const { fetchLogin } = useActions();
   const { errorLogin, isTryingToLogin } = useTypedSelector((state) => state.auth);
-  const [showPassword, setShowPassword] = useState(false);
   const validationSchema = yup.object().shape({
     login: yup
       .string()
@@ -25,12 +26,12 @@ const Login: FC = () => {
   });
   return (
     <div className={styles['login-page']}>
+      <Header />
       <div className={styles['login-page__picture']}>
         <img src={LogoSvg} alt="Лого выборов мэра Москвы 2" />
       </div>
-      <div className={styles['login-page__content']}>
-        <Header isHideClocks={true} />
-        <div className={styles['content-container']}>
+      <div className={styles['login-page__content-container']}>
+        <div className={styles['content']}>
           <Formik
             initialValues={{ login: '', password: '' }}
             validationSchema={validationSchema}
@@ -57,82 +58,37 @@ const Login: FC = () => {
                   )}>
                   Неверные данные. Попробуйте ещё раз
                 </small>
-                <label htmlFor="login" className={styles['login-form__label']}>
-                  Логин
-                </label>
-                <input
+                <FormInput
+                  labelName="Логин"
+                  id="login"
+                  name="login"
                   type="text"
-                  placeholder="Логин"
                   value={values.login}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={classNames(
-                    styles['login-form__input'],
-                    touched.login && errors.login
-                      ? styles['login-form__input_error']
-                      : null,
-                  )}
-                  id="login"
-                  name="login"
-                  required
+                  errorMessage={errors.login || ''}
+                  required={true}
+                  showError={!!(touched.login && errors.login)}
+                  placeholder="Ваш логин"
                 />
 
-                <small
-                  className={classNames(
-                    styles['login-form__error'],
-                    touched.login && errors.login
-                      ? styles['login-form__error_showing']
-                      : null,
-                  )}>
-                  {errors.login || ''}
-                </small>
-
-                <label htmlFor="password" className={styles['login-form__label']}>
-                  Пароль
-                </label>
-                <div className={styles['login-form__input-wrapper']}>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    name="password"
-                    placeholder="Пароль"
-                    className={classNames(
-                      styles['login-form__input'],
-                      styles['login-form__input_with-icon'],
-                      touched.password && errors.password
-                        ? styles['login-form__input_error']
-                        : null,
-                    )}
-                    value={values.password}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    id="password"
-                    required
-                  />
-                  <img
-                    src={EyeSvg}
-                    alt="show password"
-                    className={styles['login-form__input-icon']}
-                    onClick={() => {
-                      setShowPassword((prev) => !prev);
-                    }}
-                  />
-                </div>
-                <small
-                  className={classNames(
-                    styles['login-form__error'],
-                    touched.password && errors.password
-                      ? styles['login-form__error_showing']
-                      : null,
-                  )}>
-                  {errors.password || ''}
-                </small>
-
-                <button
-                  type="submit"
-                  className={styles['login-form__button']}
-                  disabled={isTryingToLogin && !isValid}>
+                <FormInput
+                  labelName="Пароль"
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={values.password}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  errorMessage={errors.password || ''}
+                  required={true}
+                  showError={!!(touched.password && errors.password)}
+                  hasIcon
+                  iconUrl={EyeSvg}
+                />
+                <FormButton type="submit" disabled={isTryingToLogin && !isValid}>
                   {isTryingToLogin ? <LoadingSpinner /> : 'Войти'}
-                </button>
+                </FormButton>
               </form>
             )}
           </Formik>

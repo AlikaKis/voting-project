@@ -1,4 +1,9 @@
 .header{
+    position: absolute;
+    background-color: transparent;
+    top: 0;
+    left: 0;
+    z-index: 10;
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -10,7 +15,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 15px 40px;
+        // padding: 15px 40px;
         width: 192px;
         height: 54px;
         font-size: 40px;
@@ -25,5 +30,35 @@
     }
     &__clock_hidden{
         visibility: hidden;
+    }
+}
+
+@media screen and (max-width:1024px) {
+    .header {
+        padding: 20px 30px;
+    }
+
+}
+
+@media screen and (max-width:768px) {
+    .header {
+        padding: 20px 20px;
+        align-items: center;
+        height: auto;
+        max-height: 120px;
+
+        &__clock{
+            width: 30%;
+            height: 44px;
+            font-size: 22px;
+            margin-right: 6%;
+    
+        }
+
+        &__logo{
+            height: auto;
+            max-height: 80px;
+            width: 64%;
+        }
     }
 }

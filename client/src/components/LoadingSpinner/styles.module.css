@@ -21,3 +21,14 @@
     transform: rotate(360deg);
   }
 }
+
+@media screen and (max-width: 768px) {
+  .spinner {
+    width: 30px;
+    height: 30px;
+  }
+  .spinner:after {
+    width: 30px;
+    height: 30px;
+  }
+}

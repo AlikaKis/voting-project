@@ -2,7 +2,7 @@ import { AuthAction, AuthActionsEnum, AuthState } from './types';
 
 const initialState: AuthState = {
   access_token: null,
-  isRefreshing: false,
+  isRefreshing: true,
   isTryingToLogin: false,
   errorRefreshing: null,
   errorLogin: null,
@@ -23,7 +23,7 @@ export default function exampleReducer(
     case AuthActionsEnum.IS_TRYING_LOGIN_ACTION:
       return { ...state, isTryingToLogin: action.payload };
     case AuthActionsEnum.ERROR_REFRESH_ACTION:
-      return { ...state, errorRefreshing: action.payload, isFirstRefreshDone: true };
+      return { ...state, errorRefreshing: action.payload };
     case AuthActionsEnum.ERROR_LOGIN_ACTION:
       return { ...state, errorLogin: action.payload };
     default:
