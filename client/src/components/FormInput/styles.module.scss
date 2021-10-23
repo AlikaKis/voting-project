@@ -58,9 +58,13 @@
         color: var(--secondary-red-color);
         margin-bottom: 20px;
         visibility: hidden;
+        &_display{
+            display: none;
+        }
 
         &_showing {
             visibility: visible;
+            display: block;
         }
     }
     
@@ -92,6 +96,7 @@
             font-size: 16px;
             margin-bottom: 10px;
         }
+        
     }
     
 }

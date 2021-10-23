@@ -3,6 +3,7 @@ import { Formik } from 'formik';
 import { FC } from 'react';
 import * as yup from 'yup';
 
+import ErrorAlert from '../../components/ErrorAlert/ErrorAlert';
 import FormButton from '../../components/FormButton/FormButton';
 import FormInput from '../../components/FormInput/FormInput';
 import Header from '../../components/Header/Header';
@@ -48,16 +49,18 @@ const Login: FC = () => {
               isValid,
             }) => (
               <form onSubmit={handleSubmit} className={styles['login-form']}>
-                <p className={styles['login-form__description']}>
-                  Введите логин и пароль
-                </p>
-                <small
+                <ErrorAlert
+                  header="Неверный логин или пароль"
+                  description="Проверьте вводимые данные"
                   className={classNames(
                     styles['login-form__main-error'],
                     errorLogin ? styles['login-form__main-error_showing'] : null,
-                  )}>
-                  Неверные данные. Попробуйте ещё раз
-                </small>
+                  )}
+                />
+                <p className={styles['login-form__description']}>
+                  Введите логин и пароль
+                </p>
+
                 <FormInput
                   labelName="Логин"
                   id="login"

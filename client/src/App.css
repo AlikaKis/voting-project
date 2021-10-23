@@ -30,6 +30,7 @@
 
 :root {
   --font-family: "DMSans", sans-serif;
+  --font-family-desk: "HoneyScriptCYR", sans-serif;
   --primary-color: #104AA1;
   --secondary-red-color: #BD181E;
   --secondary-gray-color: #979797;
@@ -38,6 +39,7 @@
   --text-color-light: #fff;
   --background-color: #fff;
   --background-secondary-color: #F5F9FF;
+  --background-alert-color: #FDE8E6;
 }
 
 .list-reset {

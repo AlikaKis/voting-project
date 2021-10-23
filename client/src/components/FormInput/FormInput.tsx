@@ -18,6 +18,8 @@ interface FormInputProps {
   hasIcon?: boolean;
   iconUrl?: string;
   placeholder?: string;
+  hideLabel?: boolean;
+  useErrorDisplay?: boolean;
 }
 
 const FormInput: FC<FormInputProps> = (props) => {
@@ -28,9 +30,12 @@ const FormInput: FC<FormInputProps> = (props) => {
         styles['form-input'],
         props.className ? props.className : null,
       )}>
-      <label htmlFor={props.id} className={styles['form-input__label']}>
-        {props.labelName}
-      </label>
+      {!props.hideLabel ? (
+        <label htmlFor={props.id} className={styles['form-input__label']}>
+          {props.labelName}
+        </label>
+      ) : null}
+
       <div className={styles['form-input__input-wrapper']}>
         <input
           type={showPassword ? 'text' : props.type}
@@ -62,6 +67,7 @@ const FormInput: FC<FormInputProps> = (props) => {
       <small
         className={classNames(
           styles['form-input__error'],
+          props.useErrorDisplay ? styles['form-input__error_display'] : null,
           props.showError ? styles['form-input__error_showing'] : null,
         )}>
         {props.errorMessage}
