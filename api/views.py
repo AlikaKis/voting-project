@@ -10,7 +10,7 @@ from api.utils import generate_access_token, generate_refresh_token
 
 from app.settings import DOMAIN, REFRESH_TOKEN_TIME_IN_DAYS, SECRET_KEY, DEBUG
 from .serializers import UserSerializer
-from .models import RefreshTokens, User
+from .models import RefreshTokens, User, VotingArea, Result, Candidate
 import jwt
 
 
@@ -132,3 +132,40 @@ class UserView(APIView):
         user = request.user
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+
+class TurnoutAndResults(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny, ]
+
+    def get(self, request):
+        maxVoters = 0
+        votedNumber = 0
+
+        for votingArea in VotingArea.objects.all():
+            maxVoters += votingArea.max_people
+            votedNumber += votingArea.count_voters
+
+        turnout = round(votedNumber / maxVoters * 100, 2)
+
+        checkedBulletins = 0
+
+        for result in Result.objects.all():
+            checkedBulletins += result.count_votes
+
+        checkedBulletinsPercentage = round(checkedBulletins / votedNumber * 100, 2)
+
+        candidateResults = {}
+
+        for candidate in Result.objects.all():
+            candidateResults[candidate.candidate.full_name] = round(candidate.count_votes / checkedBulletins * 100, 2)
+
+        response = Response()
+
+        response.data = {
+            'turnout': turnout,
+            'checkedBulletinsPercentage' : checkedBulletinsPercentage,
+            'candidateResults' : candidateResults
+        }
+
+        return response
