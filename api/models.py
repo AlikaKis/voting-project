@@ -113,7 +113,7 @@ class Protocol(models.Model):
 
 class VotingArea(models.Model):
     district = models.TextField(
-        verbose_name="Административный округ", unique=True)
+        verbose_name="Административный округ", unique=True, null=True, blank=True)
     is_opened = models.BooleanField(
         verbose_name="Участок открыт", default=True)
     num_voting_area = models.IntegerField(

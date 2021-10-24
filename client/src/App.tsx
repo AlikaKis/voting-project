@@ -17,15 +17,11 @@ const App: FC = () => {
   }, []);
 
   useEffect(() => {
-    switch (history.location.pathname) {
-      case RouteNames.LOGIN_PAGE:
-        if (access_token) history.push(RouteNames.EMPLOYEE_PAGE);
-        break;
-      case RouteNames.EMPLOYEE_PAGE:
-        if (!access_token) history.push(RouteNames.LOGIN_PAGE);
-        break;
-      default:
-        break;
+    if (history.location.pathname === RouteNames.LOGIN_PAGE) {
+      if (access_token) history.push(RouteNames.EMPLOYEE_PAGE);
+    }
+    if (history.location.pathname.includes(RouteNames.EMPLOYEE_PAGE)) {
+      if (!access_token) history.push(RouteNames.LOGIN_PAGE);
     }
   }, [access_token, history.location.pathname]);
   return (
