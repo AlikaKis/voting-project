@@ -61,11 +61,11 @@ class ProtocolAdmin(admin.ModelAdmin):
 
 
 class VotingAreaAdmin(admin.ModelAdmin):
-    list_display = ('address', 'num_voting_area',
+    list_display = ('district', 'num_voting_area',
                     'is_opened', 'max_people', 'count_voters', 'user', 'protocol')
     fieldsets = ((None, {
         'fields': (
-            'address', 'num_voting_area',
+            'district', 'num_voting_area',
             'is_opened', 'max_people', 'count_voters', 'user', 'protocol'
 
         )
@@ -73,11 +73,11 @@ class VotingAreaAdmin(admin.ModelAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('address', 'num_voting_area',
+            'fields': ('district', 'num_voting_area',
                        'is_opened', 'max_people', 'count_voters', 'user', 'protocol'),
         }),
     )
-    search_fields = ('address', 'num_voting_area')
+    search_fields = ('district', 'num_voting_area')
     list_filter = ('is_opened', )
     filter_horizontal = ()
 
