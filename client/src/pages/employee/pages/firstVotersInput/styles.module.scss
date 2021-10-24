@@ -4,7 +4,6 @@
     display: flex;
 
     &__picture {
-        padding-top: 150px;
         width: 100%;
         height: 100vh;
         flex-shrink: 1;
@@ -116,8 +115,37 @@
 
 @media screen and (max-width:1024px) {
     .first-voters {
+        flex-direction: column;
+        &__picture {
+            padding-top: 150px;
+            padding-bottom: 20px;
+            width: 100%;
+            height: auto;
+            flex-shrink: 0;
+    
+            .desk {
+                min-width: fit-content;
+                height: auto;
+                padding: 30px;
+    
+                &__text {
+                    font-size: 40px;
+                }
+    
+                &__two-people {
+                    display: none;
+    
+                }
+    
+                &__one-man {
+                    display: none;
+                }
+            }
+        }
         &__content-container {
-            width: 60%;
+            width: 100%;
+            flex-shrink:0;
+            padding-top: 0;
         }
     }
 
@@ -125,8 +153,9 @@
 
 @media screen and (max-width:768px) {
     .first-voters {
+        
         &__content-container {
-            padding-top: 120px;
+            padding-top: 20px;
             width: 100%;
             align-items: center;
 
@@ -139,6 +168,11 @@
                         margin-bottom: 10px;
                     }
 
+                    &__time-left {
+                        font-size: 20px;
+                        margin-bottom: 40px;
+                    }
+
                     &__main-error {
                         font-size: 12px;
                         margin-bottom: 10px;
@@ -148,8 +182,59 @@
             }
         }
 
-        &__picture {
-            display: none;
+        &__picture{
+            padding-top: 120px;
+            .desk {
+                padding: 15px;
+                border-width: 7px;
+    
+                &__text {
+                    font-size: 30px;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width:425px) {
+    .first-voters { 
+        &__content-container {
+            padding-top: 20px;
+            width: 100%;
+            align-items: center;
+
+            .content {
+                padding-top: 0;
+
+                .first-voters-form {
+                    &__description {
+                        font-size: 20px;
+                        margin-bottom: 10px;
+                    }
+
+                    &__time-left {
+                        font-size: 20px;
+                        margin-bottom: 40px;
+                    }
+
+                    &__main-error {
+                        font-size: 12px;
+                        margin-bottom: 10px;
+
+                    }
+                }
+            }
+        }
+        &__picture{
+            padding-top: 90px;
+            .desk {
+                padding: 10px;
+                border-width: 5px;
+    
+                &__text {
+                    font-size: 24px;
+                }
+            }
         }
     }
 }

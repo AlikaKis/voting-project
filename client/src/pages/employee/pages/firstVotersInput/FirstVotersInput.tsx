@@ -9,6 +9,7 @@ import FormInput from '../../../../components/FormInput/FormInput';
 import LoadingSpinner from '../../../../components/LoadingSpinner/LoadingSpinner';
 import ManImg from '../../../../img/desk-man.png';
 import PeopleImg from '../../../../img/desk-people.png';
+import history from '../../../../utils/history';
 import styles from './styles.module.scss';
 
 const FirstVotersInput: FC = () => {
@@ -39,8 +40,9 @@ const FirstVotersInput: FC = () => {
             validationSchema={validationSchema}
             onSubmit={(values, { setSubmitting }) => {
               setTimeout(() => {
-                console.log(values);
                 setSubmitting(false);
+                alert(`На сервер отправились данные : ${JSON.stringify(values)}`);
+                history.push('/employee-page/all-voters');
               }, 1000);
             }}>
             {({
