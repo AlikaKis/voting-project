@@ -10,7 +10,7 @@ from api.utils import generate_access_token, generate_refresh_token
 
 from app.settings import DOMAIN, REFRESH_TOKEN_TIME_IN_DAYS, SECRET_KEY, DEBUG
 from .serializers import UserSerializer
-from .models import RefreshTokens, User, VotingArea, Result, Candidate
+from .models import RefreshTokens, User, VotingArea, Result
 import jwt
 
 
@@ -139,33 +139,33 @@ class TurnoutAndResults(APIView):
     permission_classes = [AllowAny, ]
 
     def get(self, request):
-        maxVoters = 0
-        votedNumber = 0
+        max_voters = 0
+        voted_number = 0
 
-        for votingArea in VotingArea.objects.all():
-            maxVoters += votingArea.max_people
-            votedNumber += votingArea.count_voters
+        for voting_area in VotingArea.objects.all():
+            max_voters += voting_area.max_people
+            voted_number += voting_area.count_voters
 
-        turnout = round(votedNumber / maxVoters * 100, 2)
+        turnout = round(voted_number / max_voters * 100, 2)
 
-        checkedBulletins = 0
+        checked_bulletins = 0
 
         for result in Result.objects.all():
-            checkedBulletins += result.count_votes
+            checked_bulletins += result.count_votes
 
-        checkedBulletinsPercentage = round(checkedBulletins / votedNumber * 100, 2)
+        checked_bulletins_percentage = round(checked_bulletins / voted_number * 100, 2)
 
-        candidateResults = {}
+        candidate_results = {}
 
         for candidate in Result.objects.all():
-            candidateResults[candidate.candidate.full_name] = round(candidate.count_votes / checkedBulletins * 100, 2)
+            candidate_results[candidate.candidate.full_name] = round(candidate.count_votes / checked_bulletins * 100, 2)
 
         response = Response()
 
         response.data = {
             'turnout': turnout,
-            'checkedBulletinsPercentage' : checkedBulletinsPercentage,
-            'candidateResults' : candidateResults
+            'checked_bulletins_percentage' : checked_bulletins_percentage,
+            'candidate_results' : candidate_results
         }
 
         return response
