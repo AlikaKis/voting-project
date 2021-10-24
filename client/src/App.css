@@ -48,6 +48,10 @@
   list-style-type: none;
 }
 
+.bold-text{
+  font-weight: 700;
+}
+
 .btn-reset {
   padding: 0;
   font-family: var(--font-family);

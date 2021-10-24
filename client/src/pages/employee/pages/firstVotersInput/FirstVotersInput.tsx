@@ -62,8 +62,8 @@ const FirstVotersInput: FC = () => {
                   className={classNames(styles['first-voters-form__main-error'])}
                 />
                 <p className={styles['first-voters-form__description']}>
-                  Введите количество избирателей, явившихся на участок к{' '}
-                  <span className={styles['time']}>12:00</span>
+                  Введите <span className={'bold-text'}>количество </span> избирателей,
+                  явившихся на участок к <span className={'bold-text'}>12:00</span>
                 </p>
 
                 <FormInput
