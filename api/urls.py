@@ -10,5 +10,5 @@ urlpatterns = [
     path('auth/refresh-tokens', RefreshTokensView.as_view()),
     path('auth/logout', LogoutView.as_view()),
     path('turnout', TurnoutAndResults.as_view()),
-    path('tenamscreen', CandidateVAInfo.as_view())
+    path('candidate-va-info', CandidateVAInfo.as_view())
 ]
