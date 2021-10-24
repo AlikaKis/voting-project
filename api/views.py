@@ -10,7 +10,7 @@ from api.utils import generate_access_token, generate_refresh_token
 
 from app.settings import DOMAIN, REFRESH_TOKEN_TIME_IN_DAYS, SECRET_KEY, DEBUG
 from .serializers import UserSerializer
-from .models import RefreshTokens, User, VotingArea, Result
+from .models import RefreshTokens, User, VotingArea, Result, Candidate
 import jwt
 
 
@@ -166,6 +166,38 @@ class TurnoutAndResults(APIView):
             'turnout': turnout,
             'checked_bulletins_percentage' : checked_bulletins_percentage,
             'candidate_results' : candidate_results
+        }
+
+        return response
+
+class CandidateVAInfo(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny, ]
+
+    def get(self, request):
+        VA_is_opened = 0
+        count_people = 0
+        info = {}
+
+        for candidate in Candidate.objects.all():
+            FIO = candidate.full_name
+            if candidate.is_self_promoted == False:
+                consigment = candidate.consigment.name
+            else:
+                consigment = 'Самовыдвиженец'
+            info[FIO] = consigment
+
+        for votingArea in VotingArea.objects.all():
+            count_people += votingArea.max_people
+            if votingArea.is_opened:
+                VA_is_opened += 1
+
+        response = Response()
+
+        response.data = {
+            'info': info,
+            'is_opened': VA_is_opened,
+            'count_people': count_people
         }
 
         return response
