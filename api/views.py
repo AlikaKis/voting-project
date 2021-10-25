@@ -10,7 +10,7 @@ from api.utils import generate_access_token, generate_refresh_token
 
 from app.settings import DOMAIN, REFRESH_TOKEN_TIME_IN_DAYS, SECRET_KEY, DEBUG
 from .serializers import UserSerializer
-from .models import RefreshTokens, User
+from .models import RefreshTokens, User, VotingArea, Result, Candidate
 import jwt
 
 
@@ -132,3 +132,72 @@ class UserView(APIView):
         user = request.user
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+
+class TurnoutAndResults(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny, ]
+
+    def get(self, request):
+        max_voters = 0
+        voted_number = 0
+
+        for voting_area in VotingArea.objects.all():
+            max_voters += voting_area.max_people
+            voted_number += voting_area.count_voters
+
+        turnout = round(voted_number / max_voters * 100, 2)
+
+        checked_bulletins = 0
+
+        for result in Result.objects.all():
+            checked_bulletins += result.count_votes
+
+        checked_bulletins_percentage = round(checked_bulletins / voted_number * 100, 2)
+
+        candidate_results = {}
+
+        for candidate in Result.objects.all():
+            candidate_results[candidate.candidate.full_name] = round(candidate.count_votes / checked_bulletins * 100, 2)
+
+        response = Response()
+
+        response.data = {
+            'turnout': turnout,
+            'checked_bulletins_percentage' : checked_bulletins_percentage,
+            'candidate_results' : candidate_results
+        }
+
+        return response
+
+class CandidateVAInfo(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny, ]
+
+    def get(self, request):
+        VA_is_opened = 0
+        count_people = 0
+        info = {}
+
+        for candidate in Candidate.objects.all():
+            FIO = candidate.full_name
+            if candidate.is_self_promoted == False:
+                consigment = candidate.consigment.name
+            else:
+                consigment = 'Самовыдвиженец'
+            info[FIO] = consigment
+
+        for votingArea in VotingArea.objects.all():
+            count_people += votingArea.max_people
+            if votingArea.is_opened:
+                VA_is_opened += 1
+
+        response = Response()
+
+        response.data = {
+            'info': info,
+            'is_opened': VA_is_opened,
+            'count_people': count_people
+        }
+
+        return response
