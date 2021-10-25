@@ -149,6 +149,18 @@
 
 @media screen and (max-width:768px) {
     .first-voters {
+        height: auto;
+        &__picture{ 
+            padding-top: 20px;
+            .desk {
+                padding: 15px;
+                border-width: 7px;
+    
+                &__text {
+                    font-size: 35px;
+                }
+            }
+        }
         
         &__content-container {
             padding-top: 20px;
@@ -178,22 +190,23 @@
             }
         }
 
-        &__picture{
-            padding-top: 120px;
-            .desk {
-                padding: 15px;
-                border-width: 7px;
-    
-                &__text {
-                    font-size: 30px;
-                }
-            }
-        }
+        
     }
 }
 
 @media screen and (max-width:425px) {
     .first-voters { 
+        &__picture{
+            .desk {
+                padding: 10px;
+                border-width: 5px;
+    
+                &__text {
+                    font-size: 24px;
+                }
+            }
+        }
+
         &__content-container {
             padding-top: 20px;
             width: 100%;
@@ -221,16 +234,6 @@
                 }
             }
         }
-        &__picture{
-            padding-top: 90px;
-            .desk {
-                padding: 10px;
-                border-width: 5px;
-    
-                &__text {
-                    font-size: 24px;
-                }
-            }
-        }
+        
     }
 }

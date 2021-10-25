@@ -9,7 +9,7 @@
     &__form {
         width: 100%;
         max-width: 1200px;
-        
+
     }
 
     .protocol-form {
@@ -17,7 +17,7 @@
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
-        
+
 
         &__wrapper {
             display: flex;
@@ -25,6 +25,7 @@
             align-items: center;
             width: 100%;
             margin-bottom: 10px;
+            padding: 0 20px;
         }
 
         &__bulletins {
@@ -45,6 +46,11 @@
 
 
             .votes {
+                &__candidate-list {
+                    max-height: 480px;
+                    overflow-y: auto;
+                }
+
                 &__input-block {
                     width: 100%;
                     display: flex;
@@ -110,7 +116,8 @@
         &__main-error {
             width: 100%;
             max-width: 500px;
-            &_hidden{
+
+            &_hidden {
                 visibility: hidden;
             }
 
@@ -123,7 +130,7 @@
             line-height: 1.17;
             color: var(--text-secondary-color);
 
-            &_hidden{
+            &_hidden {
                 visibility: hidden;
             }
 
@@ -135,6 +142,65 @@
         }
 
     }
+}
 
+@media screen and (max-width:768px) {
+    .protocol {
+        height: auto;
+        align-items: flex-start;
+        padding-top: 0;
+
+        .protocol-form {
+            padding: 20px;
+
+            &__wrapper {
+                flex-direction: column;
+                justify-content: flex-start;
+                padding: 0;
+            }
+
+            &__bulletins {
+                width: 100%;
+                max-width: 700px;
+            }
+
+            &__votes {
+                width: 100%;
+                max-width: 700px;
+
+                .votes {
+                    &__candidate-list {
+                        max-height: none;
+                    }
+
+                    &__input-block {
+                        height: 44px;
+                    }
+
+                    &__label {
+                        font-size: 18px;
+                        line-height: 1.17;
+                    }
+
+                    &__input {
+                        padding-left: 10px;
+                        font-size: 18px;
+                    }
+                }
+            }
+
+            &__description {
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+
+            &__main-error {
+                max-width: 700px;
+                font-size: 12px;
+                margin-bottom: 10px;
+
+            }
+        }
+    }
 
 }

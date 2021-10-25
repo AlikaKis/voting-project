@@ -7,7 +7,7 @@ import ErrorAlert from '../../../../components/ErrorAlert/ErrorAlert';
 import FormButton from '../../../../components/FormButton/FormButton';
 import FormInput from '../../../../components/FormInput/FormInput';
 import LoadingSpinner from '../../../../components/LoadingSpinner/LoadingSpinner';
-import history from '../../../../utils/history';
+// import history from '../../../../utils/history';
 import styles from './styles.module.scss';
 
 const ProtocolInput: FC = () => {
@@ -29,12 +29,10 @@ const ProtocolInput: FC = () => {
       .typeError('Должно быть числом')
       .min(0, 'Не может быть меньше 0')
       .required('Обязательное поле'),
-    candidatesVotesList: yup
+    candidateVotes: yup
       .array()
       .of(
         yup.object().shape({
-          id: yup.number().min(0).required('Id обязателен'),
-          full_name: yup.string().required('ФИО обязательно'),
           value: yup
             .number()
             .typeError('Должно быть числом')
@@ -56,8 +54,15 @@ const ProtocolInput: FC = () => {
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(() => {
             setSubmitting(false);
-            alert(`На сервер отправились данные : ${JSON.stringify(values, null, 2)}`);
-            history.push('/employee-page/protocol');
+            const results = {
+              bulletinsCount: values.bulletinsCount,
+              spoiledBulletinsCount: values.spoiledBulletinsCount,
+              candidateVotes: values.candidateVotes.map((item) => ({
+                id: item.id,
+                value: item.value,
+              })),
+            };
+            alert(`На сервер отправились данные : ${JSON.stringify(results, null, 2)}`);
           }, 1000);
         }}>
         {({
@@ -127,7 +132,7 @@ const ProtocolInput: FC = () => {
                 <FieldArray
                   name="candidateVotes"
                   render={() => (
-                    <>
+                    <div className={styles['votes__candidate-list']}>
                       {values.candidateVotes.map((item, index) => (
                         <div
                           key={index}
@@ -151,7 +156,7 @@ const ProtocolInput: FC = () => {
                           />
                         </div>
                       ))}
-                    </>
+                    </div>
                   )}
                 />
               </div>
