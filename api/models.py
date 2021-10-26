@@ -113,7 +113,7 @@ class Protocol(models.Model):
 
 class VotingArea(models.Model):
     district = models.TextField(
-        verbose_name="Административный округ", unique=True, null=True, blank=True)
+        verbose_name="Административный округ")
     is_opened = models.BooleanField(
         verbose_name="Участок открыт", default=True)
     num_voting_area = models.IntegerField(
@@ -175,3 +175,11 @@ class Result(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+class TimeTurnout(models.Model):
+    voting_area = models.ForeignKey(
+        VotingArea, on_delete=models.CASCADE, verbose_name= "Избирательный участок")
+    add_time = models.TimeField(
+        auto_now_add=True, verbose_name="Время ввода данных")
+    count_voters = models.IntegerField(
+        verbose_name="Кол-во проголосовавших", default=0)

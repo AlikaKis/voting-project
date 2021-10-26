@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from api.models import Candidate, Consigment, Protocol, RefreshTokens, Result, User, VotingArea
+from api.models import Candidate, Consigment, Protocol, RefreshTokens, Result, User, VotingArea, TimeTurnout
 
 
 class UserCustomAdmin(UserAdmin):
@@ -134,6 +134,26 @@ class ResultAdmin(admin.ModelAdmin):
     )
     filter_horizontal = ()
 
+class TimeTurnoutAdmin(admin.ModelAdmin):
+    list_display = ('id', 'voting_area', 'add_time', 'count_voters')
+
+    exclude = ('add_time',)
+
+    fieldsets = ((None, {
+        'fields': (
+            'voting_area', 'count_voters',
+        )
+    }),)
+
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': (
+            'voting_area', 'count_voters',
+        )
+    }),)
+
+    filter_horizontal = ()
 
 class AdminSite(admin.AdminSite):
     site_title = 'Выборы мэра Москвы'
@@ -157,3 +177,4 @@ admin.site.register(VotingArea, VotingAreaAdmin)
 admin.site.register(Consigment, ConsigmentAdmin)
 admin.site.register(Candidate, CandidateAdmin)
 admin.site.register(Result, ResultAdmin)
+admin.site.register(TimeTurnout, TimeTurnoutAdmin)
