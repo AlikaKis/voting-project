@@ -10,7 +10,7 @@ from api.utils import generate_access_token, generate_refresh_token
 
 from app.settings import DOMAIN, REFRESH_TOKEN_TIME_IN_DAYS, SECRET_KEY, DEBUG
 from .serializers import UserSerializer
-from .models import RefreshTokens, User, VotingArea, Result, Candidate
+from .models import RefreshTokens, User, VotingArea, Result, Candidate, TimeTurnout
 import jwt
 
 
@@ -134,7 +134,7 @@ class UserView(APIView):
         return Response(serializer.data)
 
 
-class TurnoutAndResults(APIView):
+class Results(APIView):
     authentication_classes = []
     permission_classes = [AllowAny, ]
 
@@ -155,10 +155,13 @@ class TurnoutAndResults(APIView):
 
         checked_bulletins_percentage = round(checked_bulletins / voted_number * 100, 2)
 
-        candidate_results = {}
+        candidate_results = []
 
         for candidate in Result.objects.all():
-            candidate_results[candidate.candidate.full_name] = round(candidate.count_votes / checked_bulletins * 100, 2)
+            candidate_results.append({
+                "candidate_id" : candidate.candidate.id,
+                "candidate" : candidate.candidate.full_name,
+                "result" : round(candidate.count_votes / checked_bulletins * 100, 2)})
 
         response = Response()
 
@@ -175,29 +178,123 @@ class CandidateVAInfo(APIView):
     permission_classes = [AllowAny, ]
 
     def get(self, request):
-        VA_is_opened = 0
+        count_opened = 0
         count_people = 0
-        info = {}
+        info = []
 
         for candidate in Candidate.objects.all():
             FIO = candidate.full_name
             if candidate.is_self_promoted == False:
                 consigment = candidate.consigment.name
             else:
-                consigment = 'Самовыдвиженец'
-            info[FIO] = consigment
+                consigment = 'Самовыдвижение'
+            info.append({
+                "candidate_id" : candidate.id,
+                "candidate" : FIO,
+                "consigment" : consigment
+            })
 
         for votingArea in VotingArea.objects.all():
             count_people += votingArea.max_people
             if votingArea.is_opened:
-                VA_is_opened += 1
+                count_opened += 1
 
         response = Response()
 
         response.data = {
             'info': info,
-            'is_opened': VA_is_opened,
+            'count_opened': count_opened,
             'count_people': count_people
+        }
+
+        return response
+
+class DistrictTurnout(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny, ]
+
+    def get(self, request):
+        district_turnout = []
+        district = VotingArea.objects.order_by('district').first().district
+        count_votes = 0
+        max_votes = 0
+        for va in VotingArea.objects.order_by('district'):
+            if district != va.district:
+                percent = round(count_votes / max_votes * 100, 2)
+                district_turnout.append({
+                    "district": district,
+                    "percent": percent
+                })
+                count_votes = va.count_voters
+                max_votes = va.max_people
+                district = va.district
+            else:
+                count_votes += va.count_voters
+                max_votes += va.max_people
+
+        percent = round(count_votes / max_votes * 100, 2)
+        district_turnout.append({
+            "district": district,
+            "percent": percent
+        })
+
+        response = Response()
+
+        response.data = {
+            "district_turnout" : district_turnout
+        }
+
+        return response
+
+class UserResults(APIView):
+    authentication_classes = [JWTAuthentication, ]
+    permission_classes = [IsEmployee, ]
+
+    def get(self, request):
+        candidates = []
+
+        for candidate in Candidate.objects.all():
+            candidates.append({
+                "candidate_id" : candidate.id,
+                "candidate" : candidate.full_name
+            })
+
+        response = Response()
+
+        response.data = {
+            "candidates" : candidates
+        }
+
+        return response
+
+class WindowInfo(APIView):
+    authentication_classes = [JWTAuthentication, ]
+    permission_classes = [IsEmployee, ]
+
+
+    def get(self, request):
+        user = request.user.id
+
+        va = VotingArea.objects.get(user=user)
+
+        response = Response()
+
+        va_data = []
+        if va.count_voters == 0:
+            response.data = {
+                "voting_area_id": va.id
+            }
+            return response
+        else:
+            for element in TimeTurnout.objects.filter(voting_area_id=va):#.order_by('count_voters'):
+                va_data.append({
+                    "time" : element.add_time,
+                    "count_voters" : element.count_voters
+                })
+
+        response.data = {
+            "voting_area_id": va.id,
+            "va_data" : va_data
         }
 
         return response
