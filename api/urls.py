@@ -13,5 +13,5 @@ urlpatterns = [
     path('candidate-va-info', CandidateVAInfo.as_view()),
     path('district-turnout', DistrictTurnout.as_view()),
     path('user-results', UserResults.as_view()),
-    path('window-info', WindowInfo.as_view())
+    path('user-turnout', WindowInfo.as_view())
 ]

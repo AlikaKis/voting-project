@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import exceptions
+from rest_framework import exceptions, status
 from api.authentication import JWTAuthentication
 from api.permissions import IsEmployee
 from api.utils import generate_access_token, generate_refresh_token
@@ -298,3 +298,13 @@ class WindowInfo(APIView):
         }
 
         return response
+
+    def post(self, request):
+
+        turnout = request.data['turnout']
+        va = VotingArea.objects.get(user=request.user.id)
+        VotingArea.objects.filter(user=request.user.id).update(count_voters=turnout)
+        TimeTurnout.objects.create(voting_area=va, count_voters=turnout)
+
+
+        return Response(status=status.HTTP_205_RESET_CONTENT)
