@@ -6,11 +6,12 @@ import styles from './styles.module.scss';
 
 interface HeaderProps {
   isHideClocks?: boolean;
+  className?: string;
 }
 
-const Header: FC<HeaderProps> = ({ isHideClocks = false }) => {
+const Header: FC<HeaderProps> = ({ isHideClocks = false, className }) => {
   return (
-    <header className={styles['header']}>
+    <header className={classNames(styles['header'], className ? className : null)}>
       <p
         className={classNames(
           styles['header__clock'],

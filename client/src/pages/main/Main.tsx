@@ -1,11 +1,14 @@
 import { FC } from 'react';
 
-import styles from './styles.module.css';
+import Header from '../../components/Header/Header';
+import CandidatesList from './pages/candidatesList/CandidatesList';
+import styles from './styles.module.scss';
 
 const Main: FC = () => {
   return (
     <div className={styles['main']}>
-      <p>Главная страница</p>
+      <Header className={styles['main__header']} />
+      <CandidatesList />
     </div>
   );
 };
