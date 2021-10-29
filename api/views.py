@@ -1,3 +1,5 @@
+import json
+
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.http import JsonResponse
 from rest_framework.permissions import AllowAny
@@ -214,16 +216,16 @@ class DistrictTurnout(APIView):
     permission_classes = [AllowAny, ]
 
     def get(self, request):
-        district_turnout = []
+        districts_turnout = []
         district = VotingArea.objects.order_by('district').first().district
         count_votes = 0
         max_votes = 0
         for va in VotingArea.objects.order_by('district'):
             if district != va.district:
-                percent = round(count_votes / max_votes * 100, 2)
-                district_turnout.append({
+                turnout = round(count_votes / max_votes * 100, 2)
+                districts_turnout.append({
                     "district": district,
-                    "percent": percent
+                    "turnout": turnout
                 })
                 count_votes = va.count_voters
                 max_votes = va.max_people
@@ -232,16 +234,16 @@ class DistrictTurnout(APIView):
                 count_votes += va.count_voters
                 max_votes += va.max_people
 
-        percent = round(count_votes / max_votes * 100, 2)
-        district_turnout.append({
+        turnout = round(count_votes / max_votes * 100, 2)
+        districts_turnout.append({
             "district": district,
-            "percent": percent
+            "turnout": turnout
         })
 
         response = Response()
 
         response.data = {
-            "district_turnout" : district_turnout
+            "districts_turnout" : districts_turnout
         }
 
         return response
@@ -266,6 +268,28 @@ class UserResults(APIView):
         }
 
         return response
+
+    def post(self, request):
+        processed_bulletins = request.data['processed_bulletins']
+        spoiled_bulletins = request.data['spoiled_bulletins']
+
+        va = VotingArea.objects.get(user=request.user.id)
+
+        protocol = va.protocol
+        protocol.number_of_voters = va.count_voters
+        protocol.number_of_bulletins = processed_bulletins
+        protocol.spoiled_bulletins = spoiled_bulletins
+        valid_bulletins = int(processed_bulletins) - int(spoiled_bulletins)
+        protocol.valid_bulletins = valid_bulletins
+
+        protocol.save()
+
+        for candidate in request.data["candidates"]:
+            result = Result.objects.get(candidate=candidate['candidate_id'])
+            result.count_votes = int(result.count_votes) + int(candidate['count_votes'])
+            result.save()
+
+        return Response(status=status.HTTP_205_RESET_CONTENT)
 
 class WindowInfo(APIView):
     authentication_classes = [JWTAuthentication, ]
