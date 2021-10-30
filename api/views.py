@@ -211,7 +211,7 @@ class CandidateVAInfo(APIView):
 
         return response
 
-class DistrictTurnout(APIView):
+class DistrictsTurnout(APIView):
     authentication_classes = []
     permission_classes = [AllowAny, ]
 
@@ -291,7 +291,7 @@ class UserResults(APIView):
 
         return Response(status=status.HTTP_205_RESET_CONTENT)
 
-class WindowInfo(APIView):
+class UserTurnout(APIView):
     authentication_classes = [JWTAuthentication, ]
     permission_classes = [IsEmployee, ]
 

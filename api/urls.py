@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import HelloWorldView, RefreshTokensView, RegisterView, LoginView, UserView, LogoutView, Results, \
-    CandidateVAInfo, DistrictTurnout, UserResults, WindowInfo
+    CandidateVAInfo, DistrictsTurnout, UserResults, UserTurnout
 
 urlpatterns = [
     path('hello-world', HelloWorldView, name='hello-world'),
@@ -9,9 +9,9 @@ urlpatterns = [
     path('user-info', UserView.as_view()),
     path('auth/refresh-tokens', RefreshTokensView.as_view()),
     path('auth/logout', LogoutView.as_view()),
-    path('show-results', Results.as_view()),
+    path('results', Results.as_view()),
     path('candidate-va-info', CandidateVAInfo.as_view()),
-    path('district-turnout', DistrictTurnout.as_view()),
+    path('districts-turnout', DistrictsTurnout.as_view()),
     path('user-results', UserResults.as_view()),
-    path('user-turnout', WindowInfo.as_view())
+    path('user-turnout', UserTurnout.as_view())
 ]
