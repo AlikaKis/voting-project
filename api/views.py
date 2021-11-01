@@ -324,11 +324,14 @@ class UserTurnout(APIView):
         return response
 
     def post(self, request):
-
-        turnout = request.data['turnout']
+        try:
+            turnout = request.data['turnout']
+        except Exception:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         va = VotingArea.objects.get(user=request.user.id)
+        if int(turnout) < 0 or int(turnout) > va.max_people or int(turnout) <= va.count_voters:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         VotingArea.objects.filter(user=request.user.id).update(count_voters=turnout)
         TimeTurnout.objects.create(voting_area=va, count_voters=turnout)
-
 
         return Response(status=status.HTTP_205_RESET_CONTENT)
