@@ -1,7 +1,8 @@
 import classNames from 'classnames';
-import { FC } from 'react';
+import { FC, memo } from 'react';
 
 import HeaderLogoSvg from '../../img/header-logo.svg';
+import ClockTime from './ClockTime';
 import styles from './styles.module.scss';
 
 interface HeaderProps {
@@ -9,7 +10,10 @@ interface HeaderProps {
   className?: string;
 }
 
-const Header: FC<HeaderProps> = ({ isHideClocks = false, className }) => {
+const Header: FC<HeaderProps> = memo(function Header({
+  isHideClocks = false,
+  className,
+}) {
   return (
     <header className={classNames(styles['header'], className ? className : null)}>
       <p
@@ -17,7 +21,7 @@ const Header: FC<HeaderProps> = ({ isHideClocks = false, className }) => {
           styles['header__clock'],
           isHideClocks ? styles['header__clock_hidden'] : null,
         )}>
-        10:40
+        <ClockTime />
       </p>
       <img
         src={HeaderLogoSvg}
@@ -26,6 +30,6 @@ const Header: FC<HeaderProps> = ({ isHideClocks = false, className }) => {
       />
     </header>
   );
-};
+});
 
 export default Header;

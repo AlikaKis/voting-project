@@ -1,5 +1,7 @@
 .candidates {
-    height: calc(100vh - 150px - 164px);
+    height: calc(100vh - 150px);
+    display: flex;
+    flex-direction: column;
     &__voting-areas {
         width: 100%;
         padding: 50px 40px;
@@ -57,7 +59,7 @@
     &__candidates-list{
         width: 100%;
         height: 100%;
-        border: 1px solid red;
+        flex-grow: 2;
     }
 }
 

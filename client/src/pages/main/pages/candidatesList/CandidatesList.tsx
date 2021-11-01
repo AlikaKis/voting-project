@@ -23,6 +23,7 @@ const CandidatesList: FC = () => {
       .join('');
   };
   useEffect(() => {}, []);
+
   return (
     <div className={styles['candidates']}>
       <div

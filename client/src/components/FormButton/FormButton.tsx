@@ -8,6 +8,7 @@ interface FormButtonProps {
   className?: string;
   disabled: boolean;
   children: ReactNode;
+  onClick?: () => void;
 }
 
 const FormButton: FC<FormButtonProps> = (props) => {
@@ -15,7 +16,8 @@ const FormButton: FC<FormButtonProps> = (props) => {
     <button
       type={props.type}
       className={classNames(styles['form-button'], props.className)}
-      disabled={props.disabled}>
+      disabled={props.disabled}
+      onClick={props.onClick}>
       {props.children}
     </button>
   );
