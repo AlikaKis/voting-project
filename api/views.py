@@ -316,29 +316,6 @@ class UserResults(APIView):
 
         return Response(status=status.HTTP_205_RESET_CONTENT)
 
-    '''def post(self, request):
-        processed_bulletins = request.data['processed_bulletins']
-        spoiled_bulletins = request.data['spoiled_bulletins']
-
-        va = VotingArea.objects.get(user=request.user.id)
-
-        protocol = va.protocol
-        protocol.number_of_voters = va.count_voters
-        protocol.number_of_bulletins = processed_bulletins
-        protocol.spoiled_bulletins = spoiled_bulletins
-        valid_bulletins = int(processed_bulletins) - int(spoiled_bulletins)
-        protocol.valid_bulletins = valid_bulletins
-
-        protocol.save()
-
-        for candidate in request.data["candidates"]:
-            result = Result.objects.get(candidate=candidate['candidate_id'])
-            result.count_votes = int(result.count_votes) + int(candidate['count_votes'])
-            result.save()
-
-        return Response(status=status.HTTP_205_RESET_CONTENT)'''
-
-
 class UserTurnout(APIView):
     authentication_classes = [JWTAuthentication, ]
     permission_classes = [IsEmployee, ]
