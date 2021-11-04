@@ -1,57 +1,56 @@
 import { useEffect, useState } from 'react';
 
+import useInterval from './useInterval';
+
 export const useDate = () => {
-  const [time, setTime] = useState(0);
-  const [today, setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date());
   const [devTime, setDevTime] = useState<
-    { hours: number; minutes: number; seconds: number } | null | undefined
+    { hours: number; minutes: number; realTimeInSeconds: number } | null | undefined
   >(undefined);
-  useEffect(() => {
-    const date = new Date();
+
+  const updateDevTime = (curTime?: Date) => {
+    const currentTime = curTime || new Date();
+    let passedSeconds =
+      Math.floor(currentTime.getTime() / 1000) - devTime!.realTimeInSeconds;
+    let passedHours = Math.floor(passedSeconds / 3600);
+    let passedMinutes = Math.floor((passedSeconds - passedHours * 3600) / 60);
+    setDate(
+      new Date(
+        currentTime.getFullYear(),
+        currentTime.getMonth(),
+        currentTime.getDay(),
+        devTime!.hours + passedHours,
+        devTime!.minutes + passedMinutes,
+      ),
+    );
+  };
+
+  useInterval(() => {
+    const currentTime = new Date();
     if (devTime) {
-      if (devTime.seconds === 0) {
-        setDate(
-          new Date(
-            date.getFullYear(),
-            date.getMonth(),
-            date.getDay(),
-            devTime.hours,
-            devTime.minutes,
-            devTime.seconds,
-          ),
-        );
+      if (
+        (Math.floor(currentTime.getTime() / 1000) - devTime.realTimeInSeconds) % 60 ===
+          0 &&
+        Math.floor(currentTime.getTime() / 1000) - devTime.realTimeInSeconds !== 0
+      ) {
+        updateDevTime(currentTime);
       }
-      setDevTime((prev) => {
-        if (prev) {
-          let newSeconds = prev.hours * 60 * 60 + prev.minutes * 60 + prev.seconds + 1;
-          return {
-            hours: Math.floor(newSeconds / 3600),
-            minutes: Math.floor((newSeconds - Math.floor(newSeconds / 3600) * 3600) / 60),
-            seconds: newSeconds % 60,
-          };
-        } else return null;
-      });
     } else {
-      if (date.getSeconds() === 0) setDate(date);
+      if (currentTime.getSeconds() === 0) setDate(currentTime);
     }
-    const timer = setTimeout(() => {
-      setTime(time + 1);
-    }, 1000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [time]);
+  }, 1000);
 
   useEffect(() => {
-    if (devTime === null) setDate(new Date());
+    const time = new Date();
+    if (!devTime) setDate(time);
+    else updateDevTime(time);
   }, [devTime]);
 
-  const setCustomTime = (hours: number, minutes: number) => {
+  const setCustomTime = (hours: number, minutes: number, realTimeInSeconds?: number) => {
     setDevTime({
       hours,
       minutes,
-      seconds: 0,
+      realTimeInSeconds: realTimeInSeconds || Math.floor(new Date().getTime() / 1000),
     });
   };
 
@@ -60,10 +59,10 @@ export const useDate = () => {
   };
 
   return {
-    day: today.getDate(),
+    day: date.getDate(),
     time: {
-      hours: today.getHours(),
-      minutes: today.getMinutes(),
+      hours: date.getHours(),
+      minutes: date.getMinutes(),
     },
     setCustomTime,
     clearCustomTime,

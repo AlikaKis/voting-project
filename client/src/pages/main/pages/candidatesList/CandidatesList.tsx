@@ -1,10 +1,10 @@
 import classNames from 'classnames';
-import { FC, useEffect, useState } from 'react';
+import { FC, memo, useEffect, useState } from 'react';
 
 import PhotosList from '../../../../components/PhotosList/PhotosList';
 import styles from './styles.module.scss';
 
-const CandidatesList: FC = () => {
+const CandidatesList: FC = memo(function CandidatesList() {
   const [areasInfo] = useState({
     isOpenedCount: 1124,
     peopleCount: 10234333,
@@ -23,6 +23,7 @@ const CandidatesList: FC = () => {
       .join('');
   };
   useEffect(() => {}, []);
+  console.log('CandidatesList render');
 
   return (
     <div className={styles['candidates']}>
@@ -47,6 +48,6 @@ const CandidatesList: FC = () => {
       <PhotosList className={styles['candidates__candidates-list']} />
     </div>
   );
-};
+});
 
 export default CandidatesList;

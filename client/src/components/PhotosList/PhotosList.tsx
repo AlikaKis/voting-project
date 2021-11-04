@@ -58,6 +58,8 @@ const PhotosList: FC<PhotosListProps> = ({ className }) => {
   useEffect(() => {
     fetchCandidates();
   }, []);
+  console.log('PhotosList render');
+
   return (
     <div
       className={classNames(
