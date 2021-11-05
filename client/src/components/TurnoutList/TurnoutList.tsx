@@ -1,85 +1,46 @@
 import classNames from 'classnames';
 import { FC, useEffect, useState } from 'react';
 
+import VotingService from '../../api/votingService';
 import useWindowDimensions from '../../hooks/useWindowDimensions';
 import FormButton from '../FormButton/FormButton';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import styles from './styles.module.scss';
-import TurnoutItem, { TurnoutModel } from './TurnoutItem/TurnoutItem';
+import TurnoutItem from './TurnoutItem/TurnoutItem';
 
 interface TurnoutListProps {
   className?: string;
 }
 
-const mockData: TurnoutModel[] = [
-  {
-    id: 1,
-    district: 'ЦАО',
-    turnout: Math.random(),
-  },
-  {
-    id: 2,
-    district: 'САО',
-    turnout: Math.random(),
-  },
-  {
-    id: 3,
-    district: 'СВАО',
-    turnout: Math.random(),
-  },
-  {
-    id: 4,
-    district: 'ВАО',
-    turnout: Math.random(),
-  },
-  {
-    id: 5,
-    district: 'ЮВАО',
-    turnout: Math.random(),
-  },
-  {
-    id: 6,
-    district: 'ЮАО',
-    turnout: Math.random(),
-  },
-  {
-    id: 7,
-    district: 'ЮЗАО',
-    turnout: Math.random(),
-  },
-  {
-    id: 8,
-    district: 'ЗАО',
-    turnout: Math.random(),
-  },
-  {
-    id: 9,
-    district: 'СЗАО',
-    turnout: Math.random(),
-  },
-  {
-    id: 10,
-    district: 'ЗелАО',
-    turnout: Math.random(),
-  },
-];
-
 const TurnoutList: FC<TurnoutListProps> = ({ className }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [turnout, setTurnout] = useState<TurnoutModel[]>([]);
+  const [turnout, setTurnout] = useState<
+    {
+      district: string;
+      turnout: number;
+    }[]
+  >([]);
   const [isMobileScreen, setMobileScreen] = useState(
     document.documentElement.clientWidth <= 768,
   );
   const { width } = useWindowDimensions();
-  const fetchTurnout = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setTurnout(mockData);
-      setIsLoading(false);
+  const fetchTurnout = async () => {
+    try {
+      setIsLoading(true);
       setIsError(false);
-    }, 1000);
+      setTimeout(async () => {
+        const result = (await VotingService.getDistrictsTurnout()).data;
+        console.log(result.districts_turnout);
+        setTurnout(result.districts_turnout);
+        setIsLoading(false);
+      }, 500);
+    } catch (error) {
+      setIsError(true);
+      setIsLoading(false);
+    }
   };
+
   useEffect(() => {
     fetchTurnout();
   }, []);
@@ -95,25 +56,33 @@ const TurnoutList: FC<TurnoutListProps> = ({ className }) => {
     <div
       className={classNames(
         styles['turnout-list'],
-        isError || isLoading ? styles['turnout-list_empty'] : null,
+        isError || isLoading || turnout.length === 0
+          ? styles['turnout-list_empty']
+          : null,
         className ? className : null,
       )}>
       {isLoading ? (
         <LoadingSpinner className={styles['turnout-list__loader']} isPrimaryColor />
-      ) : isError ? (
+      ) : isError || turnout.length === 0 ? (
         <div className={styles['turnout-list__error']}>
-          <span className={styles['error-text']}>Произошла ошибка</span>
-          <FormButton
-            type="button"
-            disabled={false}
-            className={styles['error-btn']}
-            onClick={fetchTurnout}>
-            Попробовать ещё раз
-          </FormButton>
+          {turnout.length === 0 ? (
+            <span className={styles['error-text']}>Список пустой</span>
+          ) : (
+            <>
+              <span className={styles['error-text']}>Произошла ошибка</span>
+              <FormButton
+                type="button"
+                disabled={false}
+                className={styles['error-btn']}
+                onClick={fetchTurnout}>
+                Попробовать ещё раз
+              </FormButton>
+            </>
+          )}
         </div>
       ) : (
-        turnout.map((item) => (
-          <TurnoutItem key={item.id} turnoutInfo={item} isMobileScreen={isMobileScreen} />
+        turnout.map((item, index) => (
+          <TurnoutItem key={index} turnoutInfo={item} isMobileScreen={isMobileScreen} />
         ))
       )}
     </div>

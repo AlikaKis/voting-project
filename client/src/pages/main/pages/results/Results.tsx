@@ -4,7 +4,6 @@ import ResultsList from '../../../../components/ResultsList/ResultsList';
 import styles from './styles.module.scss';
 
 const Results: FC = () => {
-  console.log('Results render');
   return (
     <div className={styles['results']}>
       <div className={styles['results__statistics']}>

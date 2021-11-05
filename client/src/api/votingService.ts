@@ -18,6 +18,7 @@ export enum API_URLS {
   LOGIN = '/auth/login',
   LOGOUT = '/auth/logout',
   CANDIDATES_AND_AREAS_INFO = '/candidate-va-info',
+  DISTRICTS_TURNOUT = '/districts-turnout',
 }
 
 api.interceptors.response.use(undefined, async (error: AxiosError) => {
@@ -98,6 +99,15 @@ export default class VotingService {
       count_opened: number;
       count_people: number;
     }>(API_URLS.CANDIDATES_AND_AREAS_INFO);
+  }
+
+  static async getDistrictsTurnout(): Promise<AxiosResponse<any>> {
+    return api.get<{
+      districts_turnout: Array<{
+        district: string;
+        turnout: number;
+      }>;
+    }>(API_URLS.DISTRICTS_TURNOUT);
   }
 
   static async logout(): Promise<AxiosResponse<{ message: string }>> {
