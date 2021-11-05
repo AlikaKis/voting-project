@@ -15,11 +15,12 @@
     }
 
     &__graph {
-        min-width: 5px;
+        width: 5px;
         max-width: 680px;
         height: 28px;
         background: var(--primary-color);
         margin-right: 20px;
+        transition: width 1s ease-in-out;
     }
 
     &__percent {
@@ -31,7 +32,7 @@
 
 }
 
-.turnout-item:not(:last-child){
+.turnout-item:not(:last-child) {
     margin-bottom: 40px;
 }
 
@@ -58,7 +59,7 @@
             width: 80px;
             margin-right: 20px;
         }
-    
+
         &__percent {
             font-size: 20px;
         }
