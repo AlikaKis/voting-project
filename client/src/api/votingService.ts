@@ -17,6 +17,7 @@ export enum API_URLS {
   REFRESH_TOKENS = '/auth/refresh-tokens',
   LOGIN = '/auth/login',
   LOGOUT = '/auth/logout',
+  CANDIDATES_AND_AREAS_INFO = '/candidate-va-info',
 }
 
 api.interceptors.response.use(undefined, async (error: AxiosError) => {
@@ -75,6 +76,28 @@ export default class VotingService {
         Authorization: `Bearer ${access_token}`,
       },
     });
+  }
+
+  static async getCandidatesAndAreasInfo(): Promise<
+    AxiosResponse<{
+      info: Array<{
+        candidate_id: number;
+        candidate: string;
+        consigment: string;
+      }>;
+      count_opened: number;
+      count_people: number;
+    }>
+  > {
+    return api.get<{
+      info: Array<{
+        candidate_id: number;
+        candidate: string;
+        consigment: string;
+      }>;
+      count_opened: number;
+      count_people: number;
+    }>(API_URLS.CANDIDATES_AND_AREAS_INFO);
   }
 
   static async logout(): Promise<AxiosResponse<{ message: string }>> {

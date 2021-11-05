@@ -1,15 +1,19 @@
 .photo-item {
-    max-width: 260px;
+    width: 260px;
+    height: 500px;
     padding: 15px;
     background-color: var(--primary-color);
     color: var(--text-color-light);
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
 
     &__img {
-        width: 100%;
-        max-width: 230px;
-        max-height: 230px;
+        width: 230px;
+        height: 230px;
         object-fit: cover;
-        margin-bottom: 23px;
+        margin: 0 auto;
+        margin-bottom: 20px;
     }
 
     &__surname {
@@ -25,17 +29,36 @@
         font-weight: 400;
         font-size: 28px;
         line-height: 1.46;
-        margin-bottom: 23px;
+        margin-bottom: 20px;
     }
 
     &__consigment {
         margin: 0;
+        margin-top: auto;
         font-weight: 400;
         font-size: 25px;
         line-height: 1.63;
         text-align: center;
 
     }
+}
+
+@media screen and (max-width:1440px) {
+    .photo-item {
+        padding: 12px;
+        height: 400px;
+        margin-right: 20px;
+
+        &__surname,
+        &__name {
+            font-size: 24px;
+        }
+
+        &__consigment {
+            font-size: 18px;
+        }
+    }
+
 }
 
 @media screen and (max-width:1024px) {
@@ -51,8 +74,42 @@
 
         &__consigment {
             font-size: 18px;
-            line-height: 2;
         }
+    }
+
+}
+
+@media screen and (max-width:768px) {
+    .photo-item {
+        height: auto;
+        min-height: 300px;
+        width: 42%;
+        margin: 0;
+        margin-bottom: 30px;
+
+        &__img {
+            width: 100%;
+            min-height: 120px;
+            max-height: 140px;
+        }
+
+        &__surname,
+        &__name {
+            font-size: 20px;
+            line-height: 1.33;
+            margin-bottom: 0;
+        }
+
+        &__name{
+            margin-bottom: 20px;
+        }
+
+        &__consigment {
+            font-size: 18px;
+        }
+    }
+    .photo-item:last-child {
+        margin-right: auto;
     }
 
 }
@@ -60,17 +117,20 @@
 @media screen and (max-width:425px) {
     .photo-item {
         padding: 8px;
+        width: 46%;
+        margin: 0;
+        margin-bottom: 30px;
+
 
         &__surname,
         &__name {
             font-size: 15px;
             line-height: 1.33;
-            margin-bottom: 0;
         }
 
         &__consigment {
             font-size: 10px;
-            line-height: 2;
+            margin-bottom: 20px;
         }
     }
 
