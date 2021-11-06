@@ -5,6 +5,7 @@ import VotingService from '../../../../api/votingService';
 import FormButton from '../../../../components/FormButton/FormButton';
 import LoadingSpinner from '../../../../components/LoadingSpinner/LoadingSpinner';
 import ResultsList from '../../../../components/ResultsList/ResultsList';
+import useInterval from '../../../../hooks/useInterval';
 import styles from './styles.module.scss';
 
 const Results: FC = () => {
@@ -41,9 +42,26 @@ const Results: FC = () => {
     }
   };
 
+  const silentFetchInfo = async () => {
+    try {
+      const result = (await VotingService.getResultsInfo()).data;
+      setVotesInfo({
+        turnout: result.turnout,
+        checked_bulletins: result.checked_bulletins_percentage,
+      });
+      setCandidates(result.candidate_results);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     fetchInfo();
   }, []);
+
+  useInterval(() => {
+    silentFetchInfo();
+  }, 15000);
 
   return (
     <div

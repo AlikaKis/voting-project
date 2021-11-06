@@ -156,7 +156,8 @@ class Results(APIView):
         for result in Result.objects.all():
             checked_bulletins += result.count_votes
 
-        checked_bulletins_percentage = round(checked_bulletins / voted_number * 100, 2)
+        checked_bulletins_percentage = round(
+            checked_bulletins / voted_number * 100, 2)
 
         candidate_results = []
 
@@ -300,21 +301,25 @@ class UserResults(APIView):
                 protocol.number_of_voters = va.count_voters
                 protocol.number_of_bulletins = processed_bulletins
                 protocol.spoiled_bulletins = spoiled_bulletins
-                protocol.valid_bulletins = int(processed_bulletins) - int(spoiled_bulletins)
+                protocol.valid_bulletins = int(
+                    processed_bulletins) - int(spoiled_bulletins)
         except ValueError:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         protocol.save()
 
         try:
             for candidate in request.data["candidates"]:
-                result = Result.objects.get(candidate=candidate['candidate_id'])
+                result = Result.objects.get(
+                    candidate=candidate['candidate_id'])
                 if (int(result.count_votes) <= processed_bulletins) and (int(result.count_votes) >= 0):
-                    result.count_votes = int(result.count_votes) + int(candidate['count_votes'])
+                    result.count_votes = int(
+                        result.count_votes) + int(candidate['count_votes'])
                 result.save()
         except ValueError:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_205_RESET_CONTENT)
+
 
 class UserTurnout(APIView):
     authentication_classes = [JWTAuthentication, ]
@@ -333,18 +338,20 @@ class UserTurnout(APIView):
         va_data = []
         if va.count_voters == 0:
             response.data = {
-                "voting_area_id": va.id
+                "voting_area_id": va.num_voting_area,
+                "va_data": va_data
             }
             return response
         else:
-            for element in TimeTurnout.objects.filter(voting_area_id=va):  # .order_by('count_voters'):
+            # .order_by('count_voters'):
+            for element in TimeTurnout.objects.filter(voting_area_id=va):
                 va_data.append({
                     "time": element.add_time,
                     "count_voters": element.count_voters
                 })
 
         response.data = {
-            "voting_area_id": va.id,
+            "voting_area_id": va.num_voting_area,
             "va_data": va_data
         }
 
@@ -365,7 +372,8 @@ class UserTurnout(APIView):
         except ValueError:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        VotingArea.objects.filter(user=request.user.id).update(count_voters=turnout)
+        VotingArea.objects.filter(
+            user=request.user.id).update(count_voters=turnout)
         TimeTurnout.objects.create(voting_area=va, count_voters=turnout)
 
         return Response(status=status.HTTP_205_RESET_CONTENT)

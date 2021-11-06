@@ -193,6 +193,7 @@ BATON = {
         {'type': 'model', 'label': 'Кандидаты', 'name': 'candidate', 'app': 'api'},
 
         {'type': 'title', 'label': 'Результаты', 'apps': ('api', )},
+        {'type': 'model', 'label': 'Явка', 'name': 'timeturnout', 'app': 'api'},
         {'type': 'model', 'label': 'Протоколы', 'name': 'protocol', 'app': 'api'},
         {'type': 'model', 'label': 'Результаты', 'name': 'result', 'app': 'api'},
     ),

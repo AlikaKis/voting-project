@@ -27,7 +27,7 @@ const Login: FC = () => {
   });
   return (
     <div className={styles['login-page']}>
-      <Header />
+      <Header className={styles['login-page__header']} />
       <div className={styles['login-page__picture']}>
         <img src={LogoSvg} alt="Лого выборов мэра Москвы 2" />
       </div>

@@ -20,6 +20,8 @@ export enum API_URLS {
   CANDIDATES_AND_AREAS_INFO = '/candidate-va-info',
   DISTRICTS_TURNOUT = '/districts-turnout',
   RESULTS_INFO = '/results',
+  TURNOUT_INFO = '/user-turnout',
+  CANDIDATES_INFO = '/user-results',
 }
 
 api.interceptors.response.use(undefined, async (error: AxiosError) => {
@@ -74,6 +76,52 @@ export default class VotingService {
 
   static async getUserInfo(access_token: string): Promise<AxiosResponse<any>> {
     return api.get<any>('/user-info', {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+  }
+
+  static async getTurnoutInfo(access_token: string): Promise<
+    AxiosResponse<{
+      voting_area_id: number;
+      va_data: [
+        {
+          time: string;
+          count_voters: number;
+        },
+      ];
+    }>
+  > {
+    return api.get<{
+      voting_area_id: number;
+      va_data: [
+        {
+          time: string;
+          count_voters: number;
+        },
+      ];
+    }>(API_URLS.TURNOUT_INFO, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+  }
+
+  static async getCandidatesInfo(access_token: string): Promise<
+    AxiosResponse<{
+      candidates: Array<{
+        candidate_id: number;
+        candidate: string;
+      }>;
+    }>
+  > {
+    return api.get<{
+      candidates: Array<{
+        candidate_id: number;
+        candidate: string;
+      }>;
+    }>(API_URLS.CANDIDATES_INFO, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
