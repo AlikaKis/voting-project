@@ -28,6 +28,26 @@
         height: 100%;
         flex-grow: 2;
     }
+
+    &_empty{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &__error{
+        .error-text{
+            display: block;
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .error-btn{
+            max-width: 320px;
+            font-size: 18px;
+            height: 48px;
+        }
+    }
 }
 
 @media screen and (max-width: 768px) {

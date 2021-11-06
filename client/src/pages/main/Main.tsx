@@ -32,8 +32,6 @@ const Main: FC = () => {
     }
   }, [minutes, hours]);
 
-  console.log('Main render');
-
   return (
     <div className={styles['main']}>
       <Header className={styles['main__header']} />

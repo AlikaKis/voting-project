@@ -11,42 +11,47 @@ export interface ResultModel {
 }
 
 interface ResultItemProps {
-  result: ResultModel;
+  result: {
+    candidate: string;
+    result: number;
+  };
   isMobileScreen: boolean;
 }
 
 const ResultItem: FC<ResultItemProps> = memo(function ResultItem(props) {
   const [style, setStyle] = useState<any>(null);
   const {
-    result: { surname, name, result },
+    result: { candidate, result },
     isMobileScreen,
   } = props;
   useEffect(() => {
     setTimeout(() => {
       if (isMobileScreen) {
         setStyle({
-          width: `calc( 50% * ${result} )`,
+          width: `calc( 50% * ${result * 0.01} )`,
         });
       } else {
         setStyle({
-          height: `calc( 20vh * ${result} )`,
+          height: `calc( 17vh * ${result * 0.01} )`,
         });
       }
     }, 100);
   }, [result, isMobileScreen]);
   return (
     <div className={styles['result-item']}>
-      <span className={styles['result-item__percent']}>{Math.floor(result * 100)}%</span>
+      <span className={styles['result-item__percent']}>{result}%</span>
       <div className={styles['result-item__graph']} style={style}></div>
       <div className={styles['result-item__candidate']}>
         <img
           src={PhotoExample}
-          alt={`фото ${surname}`}
+          alt={`фото ${candidate}`}
           className={styles['result-item__photo']}
         />
         <h2 className={styles['result-item__name']}>
-          {name}&nbsp;
-          <span className={styles['result-item__name_uppercase']}>{surname}</span>
+          <span>{candidate.split(' ')[1]}</span>
+          <span className={styles['result-item__name_uppercase']}>
+            {candidate.split(' ')[0]}
+          </span>
         </h2>
       </div>
     </div>
