@@ -150,6 +150,7 @@ class Consigment(models.Model):
 class Candidate(models.Model):
     full_name = models.CharField(
         max_length=255, unique=True, verbose_name="ФИО")
+    photo = models.ImageField(verbose_name="Фото кандидата")
     is_self_promoted = models.BooleanField(
         default=False, verbose_name="Самовыдвиженец")
     consigment = models.OneToOneField(

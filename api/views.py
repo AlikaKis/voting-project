@@ -1,3 +1,5 @@
+import base64
+
 import jwt
 from django.http import JsonResponse
 from drf_yasg.utils import swagger_auto_schema
@@ -190,14 +192,15 @@ class CandidateVAInfo(APIView):
         info = []
 
         for candidate in Candidate.objects.all():
-            FIO = candidate.full_name
+            image_data = base64.b64encode(candidate.photo.read()).decode('utf-8')
             if candidate.is_self_promoted == False:
                 consigment = candidate.consigment.name
             else:
                 consigment = 'Самовыдвижение'
             info.append({
                 "candidate_id": candidate.id,
-                "candidate": FIO,
+                "photo": image_data,
+                "candidate": candidate.full_name,
                 "consigment": consigment
             })
 
