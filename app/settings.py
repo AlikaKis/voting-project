@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'api',
     'baton.autodiscover',
+    'import_export'
 ]
 
 MIDDLEWARE = [
