@@ -1,7 +1,5 @@
-import base64
-
 import jwt
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse, HttpResponse
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import exceptions, status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -24,6 +22,20 @@ def HelloWorldView(request):
     if request.method == 'GET':
         return JsonResponse("Hello world from django's API!", safe=False)
 
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def getImage(request, image):
+    if request.method == 'GET':
+        img = open('media/' + image, mode='r').read()
+
+        return HttpResponse(img, content_type="image/jpg")
+        #second version
+        '''img = open('media/' + image, 'rb')
+
+        response = FileResponse(img)
+
+        return response'''
 
 class RegisterView(APIView):
     authentication_classes = []
@@ -192,7 +204,7 @@ class CandidateVAInfo(APIView):
         info = []
 
         for candidate in Candidate.objects.all():
-            image_data = base64.b64encode(candidate.photo.read()).decode('utf-8')
+            image_data = 'http://127.0.0.1:8000/media/' + candidate.photo.name
             if candidate.is_self_promoted == False:
                 consigment = candidate.consigment.name
             else:

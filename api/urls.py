@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import HelloWorldView, RefreshTokensView, RegisterView, LoginView, UserView, LogoutView, Results, \
-    CandidateVAInfo, DistrictsTurnout, UserResults, UserTurnout
+    CandidateVAInfo, DistrictsTurnout, UserResults, UserTurnout, getImage
 
 urlpatterns = [
     path('hello-world', HelloWorldView, name='hello-world'),
@@ -13,5 +13,6 @@ urlpatterns = [
     path('candidate-va-info', CandidateVAInfo.as_view()),
     path('districts-turnout', DistrictsTurnout.as_view()),
     path('user-results', UserResults.as_view()),
-    path('user-turnout', UserTurnout.as_view())
+    path('user-turnout', UserTurnout.as_view()),
+    path('media/<str:image>', getImage, name='get-image')
 ]
