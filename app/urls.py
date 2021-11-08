@@ -36,7 +36,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('baton/', include('baton.urls')),
     url(r'^api/', include('api.urls')),
-    re_path('(^(?!(api|admin|swagger)).*$)',
+    re_path('(^(?!(api|admin|swagger|media)).*$)',
             TemplateView.as_view(template_name="index.html")),
 ]
 
