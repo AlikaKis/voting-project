@@ -3,6 +3,10 @@
     height: 100vh;
     display: flex;
 
+    &__header{
+        position: absolute;
+    }
+
     &__picture {
         padding-top: 150px;
         width: 100%;
@@ -33,7 +37,6 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding-top: 70px;
             width: 100%;
 
             .login-form {

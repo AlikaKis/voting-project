@@ -12,6 +12,7 @@ export interface IRoute {
 
 export enum RouteNames {
   MAIN_PAGE = '/',
+  MAIN_PAGE_SCREENS = '/main',
   LOGIN_PAGE = '/login',
   EMPLOYEE_PAGE = '/employee-page',
 }
@@ -20,6 +21,10 @@ export const publicRoutes: IRoute[] = [
   {
     path: RouteNames.MAIN_PAGE,
     exact: true,
+    component: Main,
+  },
+  {
+    path: RouteNames.MAIN_PAGE_SCREENS,
     component: Main,
   },
   {

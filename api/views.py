@@ -1,19 +1,19 @@
-import json
-
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from django.http import JsonResponse
-from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
-from rest_framework.response import Response
+import jwt
+from django.http import JsonResponse, HttpResponse
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import exceptions, status
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from api.authentication import JWTAuthentication
 from api.permissions import IsEmployee
 from api.utils import generate_access_token, generate_refresh_token
-
-from app.settings import DOMAIN, REFRESH_TOKEN_TIME_IN_DAYS, SECRET_KEY, DEBUG
-from .serializers import UserSerializer
+from app.settings import REFRESH_TOKEN_TIME_IN_DAYS, SECRET_KEY
 from .models import RefreshTokens, User, VotingArea, Result, Candidate, TimeTurnout
-import jwt
+from .serializers import UserSerializer
+from app.settings import DOMAIN
 
 
 @api_view(['GET'])
@@ -23,6 +23,15 @@ def HelloWorldView(request):
     if request.method == 'GET':
         return JsonResponse("Hello world from django's API!", safe=False)
 
+
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def getImage(request, image):
+    if request.method == 'GET':
+        img = open('media/' + image, mode='r').read()
+
+        return HttpResponse(img, content_type="image/jpg")
 
 class RegisterView(APIView):
     authentication_classes = []
@@ -140,6 +149,8 @@ class Results(APIView):
     authentication_classes = []
     permission_classes = [AllowAny, ]
 
+    @swagger_auto_schema(operation_description="Метод для вывода результата выборов",
+                         responses={200: 'Выводится явка, %обработанных бюллетеней, %голосов по кандидатам'})
     def get(self, request):
         max_voters = 0
         voted_number = 0
@@ -155,45 +166,52 @@ class Results(APIView):
         for result in Result.objects.all():
             checked_bulletins += result.count_votes
 
-        checked_bulletins_percentage = round(checked_bulletins / voted_number * 100, 2)
+        checked_bulletins_percentage = round(
+            checked_bulletins / voted_number * 100, 2)
 
         candidate_results = []
 
         for candidate in Result.objects.all():
             candidate_results.append({
-                "candidate_id" : candidate.candidate.id,
-                "candidate" : candidate.candidate.full_name,
-                "result" : round(candidate.count_votes / checked_bulletins * 100, 2)})
+                "candidate_id": candidate.candidate.id,
+                "candidate": candidate.candidate.full_name,
+                "result": round(candidate.count_votes / checked_bulletins * 100, 2)})
 
         response = Response()
 
         response.data = {
             'turnout': turnout,
-            'checked_bulletins_percentage' : checked_bulletins_percentage,
-            'candidate_results' : candidate_results
+            'checked_bulletins_percentage': checked_bulletins_percentage,
+            'candidate_results': candidate_results
         }
 
         return response
+
 
 class CandidateVAInfo(APIView):
     authentication_classes = []
     permission_classes = [AllowAny, ]
 
+    @swagger_auto_schema(operation_description="Возвращает общую информацию об избирательных участках и кандидатах",
+                         responses={200: 'Выводится список информации о участках и кандидатах'})
     def get(self, request):
         count_opened = 0
         count_people = 0
         info = []
 
         for candidate in Candidate.objects.all():
-            FIO = candidate.full_name
+            image_data = None
+            if candidate.photo.name != None:
+                image_data = DOMAIN + ':8000/media/' + candidate.photo.name
             if candidate.is_self_promoted == False:
                 consigment = candidate.consigment.name
             else:
                 consigment = 'Самовыдвижение'
             info.append({
-                "candidate_id" : candidate.id,
-                "candidate" : FIO,
-                "consigment" : consigment
+                "candidate_id": candidate.id,
+                "photo": image_data,
+                "candidate": candidate.full_name,
+                "consigment": consigment
             })
 
         for votingArea in VotingArea.objects.all():
@@ -211,10 +229,13 @@ class CandidateVAInfo(APIView):
 
         return response
 
+
 class DistrictsTurnout(APIView):
     authentication_classes = []
     permission_classes = [AllowAny, ]
 
+    @swagger_auto_schema(operation_description="Возвращает явку по всем административным округам Москвы",
+                         responses={200: 'Выводится список административных округов с явкой на них'})
     def get(self, request):
         districts_turnout = []
         district = VotingArea.objects.order_by('district').first().district
@@ -243,59 +264,83 @@ class DistrictsTurnout(APIView):
         response = Response()
 
         response.data = {
-            "districts_turnout" : districts_turnout
+            "districts_turnout": districts_turnout
         }
 
         return response
+
 
 class UserResults(APIView):
     authentication_classes = [JWTAuthentication, ]
     permission_classes = [IsEmployee, ]
 
+    @swagger_auto_schema(operation_description="Метод для вывода кандидатов",
+                         responses={200: 'Выводится список кандидатов'})
     def get(self, request):
         candidates = []
 
         for candidate in Candidate.objects.all():
             candidates.append({
-                "candidate_id" : candidate.id,
-                "candidate" : candidate.full_name
+                "candidate_id": candidate.id,
+                "candidate": candidate.full_name
             })
 
         response = Response()
 
         response.data = {
-            "candidates" : candidates
+            "candidates": candidates
         }
 
         return response
 
+    @swagger_auto_schema(operation_description="Метод для ввода протокола и результатов голосования",
+                         responses={205: "Данные успешно обновлены",
+                                    400: "Неправильный ввод данных"})
     def post(self, request):
-        processed_bulletins = request.data['processed_bulletins']
-        spoiled_bulletins = request.data['spoiled_bulletins']
-
+        try:
+            processed_bulletins = request.data['processed_bulletins']
+            spoiled_bulletins = request.data['spoiled_bulletins']
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         va = VotingArea.objects.get(user=request.user.id)
 
         protocol = va.protocol
-        protocol.number_of_voters = va.count_voters
-        protocol.number_of_bulletins = processed_bulletins
-        protocol.spoiled_bulletins = spoiled_bulletins
-        valid_bulletins = int(processed_bulletins) - int(spoiled_bulletins)
-        protocol.valid_bulletins = valid_bulletins
 
+        try:
+            if (int(processed_bulletins) <= va.count_voters) and \
+                    (int(spoiled_bulletins) <= int(processed_bulletins)) and \
+                    int(processed_bulletins) >= 0 and \
+                    int(spoiled_bulletins) >= 0:
+                protocol.number_of_voters = va.count_voters
+                protocol.number_of_bulletins = processed_bulletins
+                protocol.spoiled_bulletins = spoiled_bulletins
+                protocol.valid_bulletins = int(
+                    processed_bulletins) - int(spoiled_bulletins)
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         protocol.save()
 
-        for candidate in request.data["candidates"]:
-            result = Result.objects.get(candidate=candidate['candidate_id'])
-            result.count_votes = int(result.count_votes) + int(candidate['count_votes'])
-            result.save()
+        try:
+            for candidate in request.data["candidates"]:
+                result = Result.objects.get(
+                    candidate=candidate['candidate_id'])
+                if (int(result.count_votes) <= processed_bulletins) and (int(result.count_votes) >= 0):
+                    result.count_votes = int(
+                        result.count_votes) + int(candidate['count_votes'])
+                result.save()
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_205_RESET_CONTENT)
+
 
 class UserTurnout(APIView):
     authentication_classes = [JWTAuthentication, ]
     permission_classes = [IsEmployee, ]
 
-
+    @swagger_auto_schema(operation_description="Возвращает предыдущие значения времени "
+                                               "ввода информации и количества избирателей, пришедших на избирательный участок",
+                         responses={200: 'Выводятся прошлые вводы данных'})
     def get(self, request):
         user = request.user.id
 
@@ -306,32 +351,41 @@ class UserTurnout(APIView):
         va_data = []
         if va.count_voters == 0:
             response.data = {
-                "voting_area_id": va.id
+                "voting_area_id": va.num_voting_area,
+                "va_data": va_data
             }
             return response
         else:
-            for element in TimeTurnout.objects.filter(voting_area_id=va):#.order_by('count_voters'):
+            for element in TimeTurnout.objects.filter(voting_area_id=va):
                 va_data.append({
-                    "time" : element.add_time,
-                    "count_voters" : element.count_voters
+                    "time": element.add_time,
+                    "count_voters": element.count_voters
                 })
 
         response.data = {
-            "voting_area_id": va.id,
-            "va_data" : va_data
+            "voting_area_id": va.num_voting_area,
+            "va_data": va_data
         }
 
         return response
 
+    @swagger_auto_schema(operation_description="Позволяет внести информацию о количестве пришедших избирателей на избирательный участок",
+                         responses={205: "Данные успешно обновлены",
+                                    400: "Неправильный ввод данных"})
     def post(self, request):
         try:
             turnout = request.data['turnout']
         except Exception:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         va = VotingArea.objects.get(user=request.user.id)
-        if int(turnout) < 0 or int(turnout) > va.max_people or int(turnout) <= va.count_voters:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        VotingArea.objects.filter(user=request.user.id).update(count_voters=turnout)
+        try:
+            if int(turnout) < 0 or int(turnout) > va.max_people or int(turnout) <= va.count_voters:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        VotingArea.objects.filter(
+            user=request.user.id).update(count_voters=turnout)
         TimeTurnout.objects.create(voting_area=va, count_voters=turnout)
 
         return Response(status=status.HTTP_205_RESET_CONTENT)

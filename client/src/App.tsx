@@ -3,7 +3,10 @@ import './App.css';
 import { FC, useEffect } from 'react';
 
 import AppRouter from './components/AppRouter';
+import DevTimeInput from './components/DevTimeInput/DevTimeInput';
+import TimeContext from './context/timeContext';
 import { useActions } from './hooks/useActions';
+import { useDate } from './hooks/useDate';
 import { useTypedSelector } from './hooks/useTypedSelector';
 import { RouteNames } from './routes';
 import history from './utils/history';
@@ -11,6 +14,7 @@ import history from './utils/history';
 const App: FC = () => {
   const { fetchRefreshTokens } = useActions();
   const { access_token, isFirstRefreshDone } = useTypedSelector((state) => state.auth);
+  const { time, day, setCustomTime, clearCustomTime } = useDate();
 
   useEffect(() => {
     fetchRefreshTokens();
@@ -27,9 +31,12 @@ const App: FC = () => {
     }
   }, [access_token, history.location.pathname, isFirstRefreshDone]);
   return (
-    <div className="wrapper">
-      {!isFirstRefreshDone ? <span>Загрузка</span> : <AppRouter />}
-    </div>
+    <TimeContext.Provider value={{ time, day, setCustomTime, clearCustomTime }}>
+      <div className="wrapper">
+        <DevTimeInput />
+        {!isFirstRefreshDone ? <span>Загрузка</span> : <AppRouter />}
+      </div>
+    </TimeContext.Provider>
   );
 };
 

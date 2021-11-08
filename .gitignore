@@ -8,7 +8,6 @@ media/**.*
 logs/*.log
 client/package-lock.json
 client/yarn.lock
-client/build
 # local env files
 app/.env
 frontend/.env.production

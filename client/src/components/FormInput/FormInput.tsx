@@ -9,6 +9,7 @@ interface FormInputProps {
   onChange: any;
   onBlur: any;
   className?: string;
+  classNameForInput?: string;
   showError: boolean;
   errorMessage: string;
   labelName: string;
@@ -36,7 +37,11 @@ const FormInput: FC<FormInputProps> = (props) => {
         </label>
       ) : null}
 
-      <div className={styles['form-input__input-wrapper']}>
+      <div
+        className={classNames(
+          styles['form-input__input-wrapper'],
+          props.classNameForInput ? props.classNameForInput : null,
+        )}>
         <input
           type={showPassword ? 'text' : props.type}
           placeholder={props.placeholder || ''}

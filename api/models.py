@@ -150,6 +150,8 @@ class Consigment(models.Model):
 class Candidate(models.Model):
     full_name = models.CharField(
         max_length=255, unique=True, verbose_name="ФИО")
+    photo = models.ImageField(
+        verbose_name="Фото кандидата", null=True, blank=True,)
     is_self_promoted = models.BooleanField(
         default=False, verbose_name="Самовыдвиженец")
     consigment = models.OneToOneField(
@@ -176,10 +178,18 @@ class Result(models.Model):
     def __str__(self):
         return str(self.id)
 
+
 class TimeTurnout(models.Model):
     voting_area = models.ForeignKey(
-        VotingArea, on_delete=models.CASCADE, verbose_name= "Избирательный участок")
+        VotingArea, on_delete=models.CASCADE, verbose_name="Избирательный участок")
     add_time = models.TimeField(
         auto_now_add=True, verbose_name="Время ввода данных")
     count_voters = models.IntegerField(
         verbose_name="Кол-во проголосовавших", default=0)
+
+    class Meta:
+        verbose_name = "явка"
+        verbose_name_plural = "явки"
+
+    def __str__(self):
+        return "№"+str(self.id)

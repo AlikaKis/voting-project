@@ -17,6 +17,11 @@ export enum API_URLS {
   REFRESH_TOKENS = '/auth/refresh-tokens',
   LOGIN = '/auth/login',
   LOGOUT = '/auth/logout',
+  CANDIDATES_AND_AREAS_INFO = '/candidate-va-info',
+  DISTRICTS_TURNOUT = '/districts-turnout',
+  RESULTS_INFO = '/results',
+  TURNOUT_INFO = '/user-turnout',
+  CANDIDATES_INFO = '/user-results',
 }
 
 api.interceptors.response.use(undefined, async (error: AxiosError) => {
@@ -75,6 +80,105 @@ export default class VotingService {
         Authorization: `Bearer ${access_token}`,
       },
     });
+  }
+
+  static async getTurnoutInfo(access_token: string): Promise<
+    AxiosResponse<{
+      voting_area_id: number;
+      va_data: [
+        {
+          time: string;
+          count_voters: number;
+        },
+      ];
+    }>
+  > {
+    return api.get<{
+      voting_area_id: number;
+      va_data: [
+        {
+          time: string;
+          count_voters: number;
+        },
+      ];
+    }>(API_URLS.TURNOUT_INFO, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+  }
+
+  static async getCandidatesInfo(access_token: string): Promise<
+    AxiosResponse<{
+      candidates: Array<{
+        candidate_id: number;
+        candidate: string;
+      }>;
+    }>
+  > {
+    return api.get<{
+      candidates: Array<{
+        candidate_id: number;
+        candidate: string;
+      }>;
+    }>(API_URLS.CANDIDATES_INFO, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+  }
+
+  static async getCandidatesAndAreasInfo(): Promise<
+    AxiosResponse<{
+      info: Array<{
+        candidate_id: number;
+        candidate: string;
+        consigment: string;
+      }>;
+      count_opened: number;
+      count_people: number;
+    }>
+  > {
+    return api.get<{
+      info: Array<{
+        candidate_id: number;
+        candidate: string;
+        consigment: string;
+      }>;
+      count_opened: number;
+      count_people: number;
+    }>(API_URLS.CANDIDATES_AND_AREAS_INFO);
+  }
+
+  static async getDistrictsTurnout(): Promise<AxiosResponse<any>> {
+    return api.get<{
+      districts_turnout: Array<{
+        district: string;
+        turnout: number;
+      }>;
+    }>(API_URLS.DISTRICTS_TURNOUT);
+  }
+
+  static async getResultsInfo(): Promise<
+    AxiosResponse<{
+      candidate_results: Array<{
+        candidate_id: number;
+        candidate: string;
+        result: number;
+      }>;
+      turnout: number;
+      checked_bulletins_percentage: number;
+    }>
+  > {
+    return api.get<{
+      candidate_results: Array<{
+        candidate_id: number;
+        candidate: string;
+        result: number;
+      }>;
+      turnout: number;
+      checked_bulletins_percentage: number;
+    }>(API_URLS.RESULTS_INFO);
   }
 
   static async logout(): Promise<AxiosResponse<{ message: string }>> {
