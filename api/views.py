@@ -1,5 +1,5 @@
 import jwt
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import exceptions, status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -13,6 +13,7 @@ from api.utils import generate_access_token, generate_refresh_token
 from app.settings import REFRESH_TOKEN_TIME_IN_DAYS, SECRET_KEY
 from .models import RefreshTokens, User, VotingArea, Result, Candidate, TimeTurnout
 from .serializers import UserSerializer
+from app.settings import DOMAIN
 
 
 @api_view(['GET'])
@@ -22,6 +23,15 @@ def HelloWorldView(request):
     if request.method == 'GET':
         return JsonResponse("Hello world from django's API!", safe=False)
 
+
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def getImage(request, image):
+    if request.method == 'GET':
+        img = open('media/' + image, mode='r').read()
+
+        return HttpResponse(img, content_type="image/jpg")
 
 class RegisterView(APIView):
     authentication_classes = []
@@ -190,14 +200,17 @@ class CandidateVAInfo(APIView):
         info = []
 
         for candidate in Candidate.objects.all():
-            FIO = candidate.full_name
+            image_data = None
+            if candidate.photo.name != None:
+                image_data = DOMAIN + ':8000/media/' + candidate.photo.name
             if candidate.is_self_promoted == False:
                 consigment = candidate.consigment.name
             else:
                 consigment = 'Самовыдвижение'
             info.append({
                 "candidate_id": candidate.id,
-                "candidate": FIO,
+                "photo": image_data,
+                "candidate": candidate.full_name,
                 "consigment": consigment
             })
 
@@ -343,7 +356,6 @@ class UserTurnout(APIView):
             }
             return response
         else:
-            # .order_by('count_voters'):
             for element in TimeTurnout.objects.filter(voting_area_id=va):
                 va_data.append({
                     "time": element.add_time,

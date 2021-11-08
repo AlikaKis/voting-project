@@ -100,17 +100,17 @@ class ConsigmentAdmin(admin.ModelAdmin):
 
 
 class CandidateAdmin(admin.ModelAdmin):
-    list_display = ('id', 'full_name', 'is_self_promoted', 'consigment')
+    list_display = ('id', 'full_name', 'photo', 'is_self_promoted', 'consigment')
     fieldsets = ((None, {
         'fields': (
-            'full_name', 'is_self_promoted', 'consigment',
+            'full_name', 'photo', 'is_self_promoted', 'consigment',
 
         )
     }),)
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('full_name', 'is_self_promoted', 'consigment'),
+            'fields': ('full_name', 'photo', 'is_self_promoted', 'consigment'),
         }),
     )
     search_fields = ('full_name',)
