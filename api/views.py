@@ -1,5 +1,5 @@
 import jwt
-from django.http import JsonResponse, FileResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import exceptions, status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -32,13 +32,6 @@ def getImage(request, image):
         img = open('media/' + image, mode='r').read()
 
         return HttpResponse(img, content_type="image/jpg")
-        # second version
-        '''img = open('media/' + image, 'rb')
-
-        response = FileResponse(img)
-
-        return response'''
-
 
 class RegisterView(APIView):
     authentication_classes = []
@@ -363,7 +356,6 @@ class UserTurnout(APIView):
             }
             return response
         else:
-            # .order_by('count_voters'):
             for element in TimeTurnout.objects.filter(voting_area_id=va):
                 va_data.append({
                     "time": element.add_time,
