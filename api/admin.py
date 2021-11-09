@@ -32,28 +32,29 @@ class RefreshTokensAdmin(admin.ModelAdmin):
     }),)
     filter_horizontal = ()
 
-class ProtocolResource(resources.ModelResource):
-    class Meta:
-        model = Protocol
-
-class ProtocolAdmin(ImportExportActionModelAdmin):
-    resource_class = ProtocolResource
-    list_display = ('number_of_voters', 'number_of_bulletins',
-                    'spoiled_bulletins', 'valid_bulletins')
-    filter_horizontal = ()
-
 class VotingAreaResource(resources.ModelResource):
     user = fields.Field(column_name='user', attribute='user', widget=ForeignKeyWidget(User, 'login'))
-    protocol = fields.Field(column_name='protocol', attribute='protocol', widget=ForeignKeyWidget(Protocol, 'id'))
+
     class Meta:
         model = VotingArea
 
 class VotingAreaAdmin(ImportExportActionModelAdmin):
     resource_class = VotingAreaResource
     list_display = ('district', 'num_voting_area',
-                    'is_opened', 'max_people', 'count_voters', 'user', 'protocol')
+                    'is_opened', 'max_people', 'count_voters', 'user')
     search_fields = ('district', 'num_voting_area')
     list_filter = ('is_opened', )
+    filter_horizontal = ()
+
+class ProtocolResource(resources.ModelResource):
+    voting_area = fields.Field(column_name='voting_area', attribute='voting_area', widget=ForeignKeyWidget(VotingArea, 'id'))
+    class Meta:
+        model = Protocol
+
+class ProtocolAdmin(ImportExportActionModelAdmin):
+    resource_class = ProtocolResource
+    list_display = ('voting_area', 'number_of_voters', 'number_of_bulletins',
+                    'spoiled_bulletins', 'valid_bulletins')
     filter_horizontal = ()
 
 class ConsigmentResource(resources.ModelResource):

@@ -1,4 +1,5 @@
 import jwt
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import exceptions, status
@@ -11,7 +12,7 @@ from api.authentication import JWTAuthentication
 from api.permissions import IsEmployee
 from api.utils import generate_access_token, generate_refresh_token
 from app.settings import REFRESH_TOKEN_TIME_IN_DAYS, SECRET_KEY
-from .models import RefreshTokens, User, VotingArea, Result, Candidate, TimeTurnout
+from .models import RefreshTokens, User, VotingArea, Result, Candidate, TimeTurnout, Protocol
 from .serializers import UserSerializer
 from app.settings import DOMAIN
 
@@ -297,42 +298,47 @@ class UserResults(APIView):
                          responses={205: "Данные успешно обновлены",
                                     400: "Неправильный ввод данных"})
     def post(self, request):
-        try:
-            processed_bulletins = request.data['processed_bulletins']
-            spoiled_bulletins = request.data['spoiled_bulletins']
-        except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
         va = VotingArea.objects.get(user=request.user.id)
-
-        protocol = va.protocol
-
         try:
-            if (int(processed_bulletins) <= va.count_voters) and \
+            Protocol.objects.get(voting_area=va)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Protocol.DoesNotExist:
+            try:
+                processed_bulletins = request.data['processed_bulletins']
+                spoiled_bulletins = request.data['spoiled_bulletins']
+            except Exception:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+            number_of_voters = None
+            valid_bulletins = None
+            try:
+                if (int(processed_bulletins) <= va.count_voters) and \
                     (int(spoiled_bulletins) <= int(processed_bulletins)) and \
                     int(processed_bulletins) >= 0 and \
                     int(spoiled_bulletins) >= 0:
-                protocol.number_of_voters = va.count_voters
-                protocol.number_of_bulletins = processed_bulletins
-                protocol.spoiled_bulletins = spoiled_bulletins
-                protocol.valid_bulletins = int(
-                    processed_bulletins) - int(spoiled_bulletins)
-        except ValueError:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        protocol.save()
+                    number_of_voters = int(va.count_voters)
+                    valid_bulletins = int(processed_bulletins) - int(spoiled_bulletins)
+                else :
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+            except Exception:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            for candidate in request.data["candidates"]:
-                result = Result.objects.get(
-                    candidate=candidate['candidate_id'])
-                if (int(result.count_votes) <= processed_bulletins) and (int(result.count_votes) >= 0):
-                    result.count_votes = int(
-                        result.count_votes) + int(candidate['count_votes'])
-                result.save()
-        except ValueError:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            Protocol.objects.create(voting_area=va, number_of_voters=number_of_voters,
+                                    number_of_bulletins=processed_bulletins,
+                                    spoiled_bulletins=spoiled_bulletins, valid_bulletins=valid_bulletins)
 
-        return Response(status=status.HTTP_205_RESET_CONTENT)
+            try:
+                for candidate in request.data["candidates"]:
+                    result = Result.objects.get(
+                        candidate=candidate['candidate_id'])
+                    if (int(result.count_votes) <= int(processed_bulletins)) and (int(result.count_votes) >= 0):
+                        result.count_votes = int(
+                            result.count_votes) + int(candidate['count_votes'])
+                    result.save()
+            except ValueError:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
 
+            return Response(status=status.HTTP_205_RESET_CONTENT)
 
 class UserTurnout(APIView):
     authentication_classes = [JWTAuthentication, ]

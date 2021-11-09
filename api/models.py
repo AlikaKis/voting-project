@@ -92,8 +92,30 @@ class RefreshTokens(models.Model):
     def __str__(self):
         return str(self.id)
 
+class VotingArea(models.Model):
+    district = models.TextField(
+        verbose_name="Административный округ")
+    is_opened = models.BooleanField(
+        verbose_name="Участок открыт", default=True)
+    num_voting_area = models.IntegerField(
+        verbose_name="Номер участка", default=0, unique=True)
+    max_people = models.IntegerField(
+        verbose_name="Макс кол-во людей", default=0)
+    count_voters = models.IntegerField(
+        verbose_name="Кол-во проголосовавших", default=0)
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Сотрудник")
+
+    class Meta:
+        verbose_name = "участок"
+        verbose_name_plural = "участки"
+
+    def __str__(self):
+        return "№"+str(self.num_voting_area)
 
 class Protocol(models.Model):
+    voting_area = models.ForeignKey(
+        VotingArea, on_delete=models.CASCADE, verbose_name="Избирательный участок")
     number_of_voters = models.IntegerField(
         verbose_name="Число избирателей", default=0)
     number_of_bulletins = models.IntegerField(
@@ -109,31 +131,6 @@ class Protocol(models.Model):
 
     def __str__(self):
         return str(self.id)
-
-
-class VotingArea(models.Model):
-    district = models.TextField(
-        verbose_name="Административный округ")
-    is_opened = models.BooleanField(
-        verbose_name="Участок открыт", default=True)
-    num_voting_area = models.IntegerField(
-        verbose_name="Номер участка", default=0, unique=True)
-    max_people = models.IntegerField(
-        verbose_name="Макс кол-во людей", default=0)
-    count_voters = models.IntegerField(
-        verbose_name="Кол-во проголосовавших", default=0)
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Сотрудник")
-    protocol = models.OneToOneField(
-        Protocol, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Протокол")
-
-    class Meta:
-        verbose_name = "участок"
-        verbose_name_plural = "участки"
-
-    def __str__(self):
-        return "№"+str(self.num_voting_area)
-
 
 class Consigment(models.Model):
     name = models.CharField(max_length=50, unique=True,
