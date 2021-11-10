@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from api.models import Candidate, Consigment, Protocol, RefreshTokens, Result, User, VotingArea, TimeTurnout
 from import_export.admin import ImportExportActionModelAdmin
 from import_export import resources
@@ -11,14 +12,26 @@ from import_export.widgets import ForeignKeyWidget
 #         model = User
 
 
-class UserCustomAdmin(admin.ModelAdmin):
-    # resource_class = UserCustomAdminResource
+class UserCustomAdmin(UserAdmin):
     ordering = ('login',)
-    list_display = ('id', 'email', 'login', 'userType', 'date_joined')
+    list_display = ('id', 'email', 'login',  'userType', 'date_joined')
     search_fields = ('email', 'login',)
-    readonly_fields = ('date_joined', 'last_login')
-    list_filter = ('userType', )
+    readonly_fields = ('date_joined', 'last_login',)
     filter_horizontal = ()
+    fieldsets = ((None, {
+        'fields': (
+            'login', 'email', 'password', "userType", "is_admin",
+            "last_login",
+
+        )
+    }),)
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'login', "userType", "is_admin", 'password1', 'password2'),
+        }),
+    )
+    list_filter = ('userType', )
 
 
 class RefreshTokensAdmin(admin.ModelAdmin):
