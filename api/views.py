@@ -322,17 +322,21 @@ class UserResults(APIView):
 
             try:
                 for candidate in request.data["candidates"]:
-                    result = Result.objects.get(
-                        candidate=candidate['candidate_id'])
                     candidate_votes = int(candidate['count_votes'])
-                    if (candidate_votes >= 0 and candidate_votes < processed_bulletins):
-                        result.count_votes = int(
-                            result.count_votes) + candidate_votes
-                    else:
+                    if not (candidate_votes >= 0 and candidate_votes < processed_bulletins):
                         return Response(status=status.HTTP_400_BAD_REQUEST)
-                    result.save()
             except Exception:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
+
+            for candidate in request.data["candidates"]:
+                result = Result.objects.get(
+                    candidate=candidate['candidate_id'])
+                candidate_votes = int(candidate['count_votes'])
+
+                result.count_votes = int(
+                    result.count_votes) + candidate_votes
+
+                result.save()
 
             Protocol.objects.create(voting_area=va, number_of_voters=number_of_voters,
                                     number_of_bulletins=processed_bulletins,
