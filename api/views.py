@@ -309,8 +309,6 @@ class UserResults(APIView):
             except Exception:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 
-            number_of_voters = None
-            valid_bulletins = None
             try:
                 if (int(processed_bulletins) <= va.count_voters) and \
                     (int(spoiled_bulletins) <= int(processed_bulletins)) and \
@@ -331,11 +329,12 @@ class UserResults(APIView):
                 for candidate in request.data["candidates"]:
                     result = Result.objects.get(
                         candidate=candidate['candidate_id'])
-                    if (int(result.count_votes) <= int(processed_bulletins)) and (int(result.count_votes) >= 0):
+                    candidate_votes = int(candidate['count_votes'])
+                    if (candidate_votes >= 0 and candidate_votes < processed_bulletins):
                         result.count_votes = int(
-                            result.count_votes) + int(candidate['count_votes'])
+                            result.count_votes) + candidate_votes
                     result.save()
-            except ValueError:
+            except Exception:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 
             return Response(status=status.HTTP_205_RESET_CONTENT)

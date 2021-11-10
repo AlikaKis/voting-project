@@ -114,7 +114,7 @@ class VotingArea(models.Model):
         return "№"+str(self.num_voting_area)
 
 class Protocol(models.Model):
-    voting_area = models.ForeignKey(
+    voting_area = models.OneToOneField(
         VotingArea, on_delete=models.CASCADE, verbose_name="Избирательный участок")
     number_of_voters = models.IntegerField(
         verbose_name="Число избирателей", default=0)
