@@ -175,7 +175,6 @@ class Result(models.Model):
     def __str__(self):
         return str(self.id)
 
-
 class TimeTurnout(models.Model):
     voting_area = models.ForeignKey(
         VotingArea, on_delete=models.CASCADE, verbose_name="Избирательный участок")

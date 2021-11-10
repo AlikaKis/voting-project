@@ -109,7 +109,6 @@ class TimeTurnoutResource(resources.ModelResource):
     class Meta:
         model = TimeTurnout
 
-
 class TimeTurnoutAdmin(ImportExportActionModelAdmin):
     resource_class = TimeTurnoutResource
     list_display = ('id', 'voting_area', 'add_time', 'count_voters')

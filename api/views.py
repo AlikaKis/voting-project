@@ -270,7 +270,6 @@ class DistrictsTurnout(APIView):
 
         return response
 
-
 class UserResults(APIView):
     authentication_classes = [JWTAuthentication, ]
     permission_classes = [IsEmployee, ]
