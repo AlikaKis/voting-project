@@ -6,18 +6,33 @@ from import_export import resources
 from import_export import fields
 from import_export.widgets import ForeignKeyWidget
 
-class UserCustomAdminResource(resources.ModelResource):
-    class Meta:
-        model = User
 
-class UserCustomAdmin(ImportExportActionModelAdmin):
-    resource_class = UserCustomAdminResource
+# class UserCustomAdminResource(resources.ModelResource):
+#     class Meta:
+#         model = User
+
+
+class UserCustomAdmin(UserAdmin):
     ordering = ('login',)
-    list_display = ('id', 'email', 'login', 'userType', 'date_joined')
+    list_display = ('id', 'email', 'login',  'userType', 'date_joined')
     search_fields = ('email', 'login',)
     readonly_fields = ('date_joined', 'last_login',)
-    list_filter = ('userType', )
     filter_horizontal = ()
+    fieldsets = ((None, {
+        'fields': (
+            'login', 'email', 'password', "userType", "is_admin",
+            "last_login",
+
+        )
+    }),)
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'login', "userType", "is_admin", 'password1', 'password2'),
+        }),
+    )
+    list_filter = ('userType', )
+
 
 class RefreshTokensAdmin(admin.ModelAdmin):
     list_display = ('userId', 'refreshToken', 'created_at', 'expiresIn')
