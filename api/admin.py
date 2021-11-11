@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.hashers import make_password
+
 from api.models import Candidate, Consigment, Protocol, RefreshTokens, Result, User, VotingArea, TimeTurnout
 from import_export.admin import ImportExportActionModelAdmin
 from import_export import resources
@@ -7,8 +9,13 @@ from import_export import fields
 from import_export.widgets import ForeignKeyWidget
 
 class UserCustomAdminResource(resources.ModelResource):
+    def before_import_row(self, row, **kwargs):
+        value = row['password']
+        row['password'] = make_password(value)
+
     class Meta:
         model = User
+
 
 class UserCustomAdmin(ImportExportActionModelAdmin):
     resource_class = UserCustomAdminResource
@@ -16,8 +23,23 @@ class UserCustomAdmin(ImportExportActionModelAdmin):
     list_display = ('id', 'email', 'login', 'userType', 'date_joined')
     search_fields = ('email', 'login',)
     readonly_fields = ('date_joined', 'last_login',)
-    list_filter = ('userType', )
     filter_horizontal = ()
+    fieldsets = ((None, {
+        'fields': (
+            'login', 'email', 'password', "userType", "is_admin",
+            "last_login",
+
+        )
+    }),)
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'login', "userType", "is_admin", 'password1', 'password2'),
+        }),
+    )
+    list_filter = ('userType',)
+    filter_horizontal = ()
+
 
 class RefreshTokensAdmin(admin.ModelAdmin):
     list_display = ('userId', 'refreshToken', 'created_at', 'expiresIn')
