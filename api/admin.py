@@ -17,29 +17,6 @@ class UserCustomAdminResource(resources.ModelResource):
     class Meta:
         model = User
 
-
-# class UserCustomAdmin(ImportExportActionModelAdmin):
-#     resource_class = UserCustomAdminResource
-#     ordering = ('login',)
-#     list_display = ('id', 'email', 'login', 'userType', 'date_joined')
-#     search_fields = ('email', 'login',)
-#     readonly_fields = ('date_joined', 'last_login',)
-#     filter_horizontal = ()
-#     fieldsets = ((None, {
-#         'fields': (
-#             'login', 'email', 'password', "userType", "is_admin",
-#             "last_login",
-#
-#         )
-#     }),)
-#     add_fieldsets = (
-#         (None, {
-#             'classes': ('wide',),
-#             'fields': ('email', 'login', "userType", "is_admin", 'password1', 'password2'),
-#         }),
-#     )
-#     list_filter = ('userType',)
-#     filter_horizontal = ()
 class UserCustomAdmin(UserAdmin, ImportExportActionModelAdmin):
     resource_class = UserCustomAdminResource
     ordering = ('login',)
