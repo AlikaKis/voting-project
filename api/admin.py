@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.hashers import make_password
+from django import forms
+from django.core.exceptions import ValidationError
 
 from api.models import Candidate, Consigment, Protocol, RefreshTokens, Result, User, VotingArea, TimeTurnout
 from import_export.admin import ImportExportActionModelAdmin
@@ -16,6 +18,7 @@ class UserCustomAdminResource(resources.ModelResource):
 
     class Meta:
         model = User
+
 
 class UserCustomAdmin(UserAdmin, ImportExportActionModelAdmin):
     resource_class = UserCustomAdminResource
@@ -89,6 +92,7 @@ class ConsigmentResource(resources.ModelResource):
         model = Consigment
 
 
+
 class ConsigmentAdmin(ImportExportActionModelAdmin):
     resource_class = ConsigmentResource
     list_display = ('id', 'name',)
@@ -102,8 +106,32 @@ class CandidateResource(resources.ModelResource):
     class Meta:
         model = Candidate
 
+    def before_import(self, dataset, using_transactions, dry_run, **kwargs):
+        for row in dataset:
+            if row[0] and int(row[4]):
+                raise ValidationError(f"Кандидат не может состоять в партии и быть самовыдвиженцем одновременно"
+                                      f" Ошибка у кандидата с именем   {row[2]}")
+
+
+
+
+class CandidateAdminForm(forms.ModelForm):
+    class Meta:
+        model = Candidate
+        fields = "__all__"
+
+    def clean(self):
+        cleaned_data = super(CandidateAdminForm, self).clean()
+        consigment = cleaned_data.get("consigment")
+        is_self_promoted = cleaned_data.get("is_self_promoted")
+
+        if consigment and is_self_promoted:
+                raise forms.ValidationError(
+                    "Кандидат не может состоять в партии и быть самовыдвиженцем одновременно"
+                )
 
 class CandidateAdmin(ImportExportActionModelAdmin):
+    form = CandidateAdminForm
     resource_class = CandidateResource
     list_display = ('id', 'photo', 'full_name', 'is_self_promoted', 'consigment')
     search_fields = ('full_name',)
